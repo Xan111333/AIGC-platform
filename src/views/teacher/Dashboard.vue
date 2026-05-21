@@ -369,24 +369,18 @@ const handlePeriodChange = () => {
 
 const handleExportReport = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://aigc-platform-production.up.railway.app'}/api/statistics/export-report`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    
-    if (!response.ok) throw new Error('Export failed')
-    
-    const blob = await response.blob()
+    const subs = await API.getTaskSubmissions(0)
+    const rows = subs.map(s => `${s.student_name || ''},${s.task_title || ''},${s.grade?.score || ''},${s.grade?.feedback || ''}`)
+    const csv = '学生,任务,分数,评语\n' + rows.join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'grade_report.xlsx'
+    link.download = 'grade_report.csv'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
-    
     ElMessage.success('报表导出成功')
   } catch (error) {
     console.error('Export error:', error)

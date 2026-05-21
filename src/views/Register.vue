@@ -202,6 +202,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import API from '../api/index.js'
 
 const form = reactive({
   username: '',
@@ -248,11 +249,8 @@ const handleRegister = async () => {
   isLoading.value = true
   
   try {
-    const response = await fetch('https://aigc-platform-production.up.railway.app/api/auth/register', {
+    await API.request('/api/auth/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         username: form.username,
         email: form.email,
@@ -260,12 +258,6 @@ const handleRegister = async () => {
         full_name: form.username
       })
     })
-    
-    const data = await response.json()
-    
-    if (!response.ok) {
-      throw new Error(data.detail || '注册失败')
-    }
     
     ElMessage.success('注册成功，请登录')
     
