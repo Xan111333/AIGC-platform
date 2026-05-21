@@ -369,7 +369,7 @@ const handlePeriodChange = () => {
 
 const handleExportReport = async () => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/statistics/export-report`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://aigc-platform-production.up.railway.app'}/api/statistics/export-report`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
