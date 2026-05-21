@@ -27,6 +27,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(title="AIGC 实训平台", version="1.0.0")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://xan111333.github.io", "http://localhost:5173", "http://localhost:8000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 def simple_hash(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
