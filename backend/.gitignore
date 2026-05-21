@@ -35,6 +35,5 @@ logs/
 Thumbs.db
 
 # Build artifacts
-dist/
 build/
 *.egg-info/

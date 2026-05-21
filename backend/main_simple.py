@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from datetime import datetime, timedelta
 from jose import jwt
 from pydantic import BaseModel
@@ -23,15 +25,7 @@ SECRET_KEY = "test-secret-key-for-development-only"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-app = FastAPI(title="AIGC 实训平台 API", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = FastAPI(title="AIGC 实训平台", version="1.0.0")
 
 def simple_hash(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
@@ -186,8 +180,13 @@ async def require_admin(current_user = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="需要管理员权限")
     return current_user
 
+DIST_DIR = os.path.join(os.path.dirname(__file__), "dist")
+
 @app.get("/")
 def root():
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {"message": "AIGC 实训平台 API 服务已启动"}
 
 @app.get("/health")
@@ -1415,6 +1414,20 @@ def admin_statistics(current_user = Depends(require_admin)):
         "total_tasks": len(tasks),
         "total_submissions": len(submissions)
     }
+
+# ==================== 静态文件服务 ====================
+if os.path.exists(DIST_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
+
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    file_path = os.path.join(DIST_DIR, full_path)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    index_path = os.path.join(DIST_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="Not found")
 
 if __name__ == "__main__":
     import uvicorn

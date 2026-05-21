@@ -1,4 +1,4 @@
-const BASE_URL = 'https://aigc-platform-production.up.railway.app'
+const BASE_URL = ''
 
 const API = {
   getToken() {
