@@ -237,7 +237,7 @@ const API = {
     const res = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${ZHIPU_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'cogview-3-plus', prompt })
+      body: JSON.stringify({ model: 'cogview-3-flash', prompt })
     })
     if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error?.message || 'AI 图像生成失败') }
     const data = await res.json()

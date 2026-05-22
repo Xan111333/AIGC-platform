@@ -145,11 +145,18 @@
           </div>
           
           <div class="generate-footer">
-            <button 
-              class="generate-btn" 
-              @click="handleGenerate" 
-              :disabled="isGenerating || !prompt.trim()"
-              :class="{ loading: isGenerating }"
+            <div class="daily-limit-info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>今日剩余 <strong>{{ remainingCount }}</strong> / {{ DAILY_LIMIT }} 次</span>
+            </div>
+            <button
+              class="generate-btn"
+              @click="handleGenerate"
+              :disabled="isGenerating || !prompt.trim() || remainingCount <= 0"
+              :class="{ loading: isGenerating, disabled: remainingCount <= 0 }"
             >
               <div v-if="isGenerating" class="loading-spinner">
                 <svg class="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -160,7 +167,7 @@
               <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
-              <span>{{ isGenerating ? '正在创作...' : '开始生成' }}</span>
+              <span>{{ remainingCount <= 0 ? '今日次数已用完' : (isGenerating ? '正在创作...' : '开始生成') }}</span>
             </button>
           </div>
         </aside>
@@ -297,12 +304,38 @@ import { ElMessage } from 'element-plus'
 import AppLayout from '../components/AppLayout.vue'
 import API from '../api'
 
+const DAILY_LIMIT = 5
+
+function getTodayDate() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+function getDailyCount() {
+  try {
+    const record = JSON.parse(localStorage.getItem('aigc_image_daily') || 'null')
+    if (!record || record.date !== getTodayDate()) return 0
+    return record.count || 0
+  } catch { return 0 }
+}
+
+function addDailyCount() {
+  const today = getTodayDate()
+  let record = { date: today, count: 0 }
+  try { record = JSON.parse(localStorage.getItem('aigc_image_daily') || 'null') || record } catch {}
+  if (record.date !== today) record = { date: today, count: 0 }
+  record.count++
+  localStorage.setItem('aigc_image_daily', JSON.stringify(record))
+  return record.count
+}
+
 const prompt = ref('')
 const uploadedImage = ref('')
 const isGenerating = ref(false)
 const generatedImages = ref([])
 const progressPercent = ref(0)
 const loadingMessage = ref('正在初始化生成...')
+const remainingCount = ref(DAILY_LIMIT - getDailyCount())
 
 const fileInput = ref(null)
 let timer = null
@@ -419,6 +452,17 @@ const handleGenerate = async () => {
     return
   }
 
+  const currentCount = getDailyCount()
+  if (currentCount >= DAILY_LIMIT) {
+    ElMessage.warning('今日免费次数已用完，明天再来吧')
+    return
+  }
+
+  const canGenerate = Math.min(params.count, DAILY_LIMIT - currentCount)
+  if (canGenerate < params.count) {
+    ElMessage.info(`今日剩余 ${DAILY_LIMIT - currentCount} 次，本次将生成 ${canGenerate} 张`)
+  }
+
   isGenerating.value = true
   generatedImages.value = []
   startProgress()
@@ -427,13 +471,14 @@ const handleGenerate = async () => {
     const results = []
     const enhancedPrompt = `${prompt.value}，${styleMap[params.style] || ''}风格，分辨率${params.resolution}`
 
-    for (let i = 0; i < params.count; i++) {
+    for (let i = 0; i < canGenerate; i++) {
       const result = await API.generateImage(enhancedPrompt, {
         resolution: params.resolution,
         style: params.style,
         num_images: 1
       })
       results.push(result.image_url || result.result_url || '')
+      remainingCount.value = DAILY_LIMIT - getDailyCount() - (i + 1)
     }
 
     stopProgress()
@@ -441,7 +486,9 @@ const handleGenerate = async () => {
     if (generatedImages.value.length === 0) {
       ElMessage.warning('未获取到图片，请重试')
     } else {
-      ElMessage.success(`成功生成 ${generatedImages.value.length} 张图片`)
+      const totalUsed = addDailyCount()
+      remainingCount.value = DAILY_LIMIT - totalUsed
+      ElMessage.success(`成功生成 ${generatedImages.value.length} 张图片，今日剩余 ${remainingCount.value} 次`)
     }
   } catch (error) {
     console.error('Image generation error:', error)
@@ -541,6 +588,35 @@ onUnmounted(() => {
   border-top: 1px solid var(--color-border);
   margin-top: 16px;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daily-limit-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  padding: 8px 12px;
+  background: var(--color-bg-glass);
+  border-radius: 8px;
+}
+
+.daily-limit-info strong {
+  color: #f472b6;
+  font-weight: 600;
+}
+
+.generate-btn.disabled {
+  background: linear-gradient(135deg, #6b7280, #9ca3af);
+  cursor: not-allowed;
+}
+
+.generate-btn.disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .panel-section {
