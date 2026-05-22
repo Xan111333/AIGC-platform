@@ -197,8 +197,11 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import API from '../api'
+
+const router = useRouter()
 
 const form = reactive({
   username: '',
@@ -269,11 +272,11 @@ const handleLogin = async () => {
     
     setTimeout(() => {
       if (userResponse.role === 'admin') {
-        window.location.href = '/admin'
+        router.push('/admin')
       } else if (userResponse.role === 'teacher') {
-        window.location.href = '/teacher-dashboard'
+        router.push('/teacher-dashboard')
       } else {
-        window.location.href = '/dashboard'
+        router.push('/dashboard')
       }
     }, 800)
   } catch (error) {

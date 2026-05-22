@@ -201,8 +201,11 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import API from '../api/index.js'
+
+const router = useRouter()
 
 const form = reactive({
   username: '',
@@ -262,7 +265,7 @@ const handleRegister = async () => {
     ElMessage.success('注册成功，请登录')
     
     setTimeout(() => {
-      window.location.href = '/'
+      router.push('/')
     }, 1000)
   } catch (error) {
     ElMessage.error(error.message || '注册失败，请稍后重试')

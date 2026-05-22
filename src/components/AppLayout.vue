@@ -289,7 +289,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import ThemeToggle from './ThemeToggle.vue'
 
@@ -305,6 +305,7 @@ defineProps({
 })
 
 const route = useRoute()
+const router = useRouter()
 const userName = ref('用户')
 const userRole = ref('student')
 const showUserMenu = ref(false)
@@ -331,9 +332,9 @@ const loadUser = () => {
 const handleLogout = () => {
   ElMessage.success('已退出登录')
   showUserMenu.value = false
-  setTimeout(() => {
-    window.location.href = '/'
-  }, 800)
+    setTimeout(() => {
+      router.push('/')
+    }, 800)
 }
 
 const handleProfile = () => {

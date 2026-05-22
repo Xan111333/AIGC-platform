@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
   {
@@ -94,7 +94,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/AIGC-platform/'),
+  history: createWebHashHistory('/AIGC-platform/'),
   routes
 })
 
