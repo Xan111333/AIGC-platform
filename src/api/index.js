@@ -30,7 +30,7 @@ function initDefaultUsers() {
   localSet('image_history', [])
   localSet('video_history', [])
   localSet('audio_history', [])
-  localSet('system_config', { site_name: 'AIGC 实训平台', site_description: '探索 AI 创作的无限可能', max_daily_generations: 50, allow_registration: true, require_content_review: false })
+  localSet('system_config', { site_name: 'AIGC 实训平台', site_description: '探索 AI 创作的无限可能', max_daily_generations: 50, allow_registration: true, require_content_review: false, api_key_status: { zhipu: true } })
 }
 initDefaultUsers()
 

@@ -316,6 +316,17 @@ const params = reactive({
 
 const stylePresets = ['写实', '卡通', '油画', '水彩', '赛博朋克', '复古', '科幻', '像素风']
 
+const styleMap = {
+  realistic: '写实',
+  cartoon: '卡通',
+  'oil-painting': '油画',
+  watercolor: '水彩',
+  pixel: '像素风',
+  cyberpunk: '赛博朋克',
+  vintage: '复古',
+  'sci-fi': '科幻'
+}
+
 const loadingMessages = [
   '正在初始化生成...',
   '正在分析提示词...',
@@ -407,33 +418,42 @@ const handleGenerate = async () => {
     ElMessage.error('请输入提示词')
     return
   }
-  
+
   isGenerating.value = true
   generatedImages.value = []
   startProgress()
-  
+
   try {
-    const result = await API.generateImage(prompt.value, {
-      resolution: params.resolution,
-      style: params.style,
-      num_images: params.count
-    })
-    
+    const results = []
+    const enhancedPrompt = `${prompt.value}，${styleMap[params.style] || ''}风格，分辨率${params.resolution}`
+
+    for (let i = 0; i < params.count; i++) {
+      const result = await API.generateImage(enhancedPrompt, {
+        resolution: params.resolution,
+        style: params.style,
+        num_images: 1
+      })
+      results.push(result.image_url || result.result_url || '')
+    }
+
     stopProgress()
-    generatedImages.value = [result.result_url]
-    ElMessage.success('生成成功')
+    generatedImages.value = results.filter(url => url)
+    if (generatedImages.value.length === 0) {
+      ElMessage.warning('未获取到图片，请重试')
+    } else {
+      ElMessage.success(`成功生成 ${generatedImages.value.length} 张图片`)
+    }
   } catch (error) {
     console.error('Image generation error:', error)
-    const results = []
-    for (let i = 0; i < params.count; i++) {
-      results.push(mockImages[i % mockImages.length])
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
     stopProgress()
-    generatedImages.value = results
-    ElMessage.success('生成成功（使用演示数据）')
+    const msg = error.message || ''
+    if (msg.includes('余额') || msg.includes('quota') || msg.includes('credit') || msg.includes('limit')) {
+      ElMessage.error('智谱AI 图片生成余额不足，请前往 open.bigmodel.cn 充值')
+    } else if (msg.includes('CORS') || msg.includes('cors')) {
+      ElMessage.error('网络跨域问题，CORS代理服务可能暂时不可用')
+    } else {
+      ElMessage.error('生成失败：' + msg)
+    }
   } finally {
     isGenerating.value = false
   }

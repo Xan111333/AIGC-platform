@@ -107,11 +107,14 @@
 
           <div class="work-preview">
             <div v-if="work.type === 'text'" class="text-preview">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-              <span class="preview-label">文本</span>
+              <img v-if="work.thumbnail" :src="work.thumbnail" :alt="work.title" class="type-thumb" />
+              <template v-else>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span class="preview-label">文本</span>
+              </template>
             </div>
             <div v-else-if="work.type === 'image'" class="image-preview">
               <img :src="work.url" :alt="work.title" />
@@ -125,12 +128,15 @@
               </div>
             </div>
             <div v-else-if="work.type === 'audio'" class="audio-preview">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-              </svg>
-              <span class="preview-label">音频</span>
+              <img v-if="work.thumbnail" :src="work.thumbnail" :alt="work.title" class="type-thumb" />
+              <template v-else>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                </svg>
+                <span class="preview-label">音频</span>
+              </template>
             </div>
           </div>
 
@@ -205,7 +211,7 @@ const mockWorks = [
     type: 'text',
     content: '人工智能技术正在深刻改变我们的生活方式。从智能家居到自动驾驶，AI已经渗透到各个领域。随着大语言模型的发展，自然语言处理能力得到了显著提升，使得智能助手能够理解和生成更加自然的语言。未来，人工智能将在更多方面发挥重要作用，为人类创造更加美好的未来。',
     url: '',
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&h=400&fit=crop',
     created_at: '2024-01-15T10:30:00'
   },
   {
@@ -214,7 +220,7 @@ const mockWorks = [
     description: '使用AI生成的美丽风景图片',
     type: 'image',
     content: '',
-    url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20landscape%20with%20mountains%20and%20lake%20at%20sunset%20realistic&image_size=landscape_16_9',
+    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
     thumbnail: '',
     created_at: '2024-01-16T14:20:00'
   },
@@ -224,7 +230,7 @@ const mockWorks = [
     description: '赛博朋克风格的城市夜景',
     type: 'image',
     content: '',
-    url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=futuristic%20city%20skyline%20at%20night%20cyberpunk%20style&image_size=landscape_16_9',
+    url: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&h=600&fit=crop',
     thumbnail: '',
     created_at: '2024-01-17T09:45:00'
   },
@@ -235,7 +241,7 @@ const mockWorks = [
     type: 'video',
     content: '',
     url: '',
-    thumbnail: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=product%20video%20thumbnail%20modern%20tech&image_size=landscape_16_9',
+    thumbnail: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&h=600&fit=crop',
     created_at: '2024-01-18T16:00:00'
   },
   {
@@ -245,8 +251,38 @@ const mockWorks = [
     type: 'audio',
     content: '',
     url: '',
-    thumbnail: '',
+    thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop',
     created_at: '2024-01-19T11:30:00'
+  },
+  {
+    id: 6,
+    title: '卡通角色设计',
+    description: '可爱的AI卡通角色插画',
+    type: 'image',
+    content: '',
+    url: 'https://images.unsplash.com/photo-1560421683-6856ea585c78?w=800&h=600&fit=crop',
+    thumbnail: '',
+    created_at: '2024-01-20T13:15:00'
+  },
+  {
+    id: 7,
+    title: '油画风景',
+    description: '印象派风格的自然风景油画',
+    type: 'image',
+    content: '',
+    url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&h=600&fit=crop',
+    thumbnail: '',
+    created_at: '2024-01-21T08:40:00'
+  },
+  {
+    id: 8,
+    title: '未来城市概念图',
+    description: '科幻风格的未来都市设计',
+    type: 'image',
+    content: '',
+    url: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&h=600&fit=crop',
+    thumbnail: '',
+    created_at: '2024-01-22T16:25:00'
   }
 ]
 
@@ -521,7 +557,8 @@ onMounted(() => {
 }
 
 .image-preview img,
-.video-preview img {
+.video-preview img,
+.type-thumb {
   width: 100%;
   height: 100%;
   object-fit: cover;

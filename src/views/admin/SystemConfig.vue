@@ -95,7 +95,11 @@ const loadConfig = async () => {
   try {
     const data = await API.request('/api/admin/system/config')
     config.value = data
-    
+
+    if (!config.value.api_key_status) {
+      config.value.api_key_status = { zhipu: true }
+    }
+
     if (data.rate_limit) {
       Object.assign(rateLimitForm, data.rate_limit)
     }
