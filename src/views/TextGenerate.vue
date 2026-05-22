@@ -346,28 +346,26 @@ const handleGenerate = async () => {
   startProgress()
   
   try {
-    const result = await API.generateText(prompt.value, {
-      length: params.length,
-      style: params.style,
-      tone: params.tone,
-      language: params.language === 'chinese' ? 'zh' : 'en'
-    })
-    
+    const styleMap = { formal: '正式', casual: '轻松', humorous: '幽默', academic: '学术', creative: '创意', concise: '简洁' }
+    const toneMap = { neutral: '中立', friendly: '友好', professional: '专业', enthusiastic: '热情', serious: '严肃' }
+    const lengthMap = { short: '100字以内', medium: '100到500字', long: '500到1000字', 'extra-long': '1000字以上' }
+    const langMap = { chinae: '中文', english: '英文', mixed: '中英混合' }
+
+    const enhancedPrompt = `${prompt.value}\n\n要求：风格${styleMap[params.style] || ''}，语气${toneMap[params.tone] || ''}，语言${langMap[params.language] || '中文'}，长度${lengthMap[params.length] || ''}。`
+
+    const results = []
+    for (let i = 0; i < params.count; i++) {
+      const result = await API.generateText(enhancedPrompt)
+      results.push(result.content || result.result_url || result)
+    }
+
     stopProgress()
-    generatedText.value = [result.result_url]
+    generatedText.value = results
     ElMessage.success('生成成功')
   } catch (error) {
     console.error('Text generation error:', error)
-    const results = []
-    for (let i = 0; i < params.count; i++) {
-      results.push(mockResults[i % mockResults.length])
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
     stopProgress()
-    generatedText.value = results
-    ElMessage.success('生成成功（使用演示数据）')
+    ElMessage.error('生成失败：' + (error.message || '请检查网络连接'))
   } finally {
     isGenerating.value = false
   }

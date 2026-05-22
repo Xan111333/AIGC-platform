@@ -219,23 +219,27 @@ const API = {
   },
 
   async _callZhipuChat(prompt) {
-    const res = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+    const apiUrl = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl)
+    const res = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${ZHIPU_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'glm-4-flash', messages: [{ role: 'user', content: prompt }] })
     })
-    if (!res.ok) throw new Error('AI 服务请求失败')
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error?.message || 'AI 服务请求失败') }
     const data = await res.json()
     return data.choices?.[0]?.message?.content || '生成失败，请重试'
   },
 
   async _callZhipuImage(prompt) {
-    const res = await fetch('https://open.bigmodel.cn/api/paas/v4/images/generations', {
+    const apiUrl = 'https://open.bigmodel.cn/api/paas/v4/images/generations'
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(apiUrl)
+    const res = await fetch(proxyUrl, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${ZHIPU_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'cogview-3-plus', prompt })
     })
-    if (!res.ok) throw new Error('AI 图像生成失败')
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error?.message || 'AI 图像生成失败') }
     const data = await res.json()
     return data.data?.[0]?.url || ''
   },
