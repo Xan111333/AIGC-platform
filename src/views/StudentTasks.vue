@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <el-dialog :title="`${currentTask?.title || '任务详情'}`" :visible.sync="showDetail" width="700px">
+      <el-dialog :title="`${currentTask?.title || '任务详情'}`" v-model="showDetail" width="700px">
         <div v-if="currentTask" class="task-detail-content">
           <div class="detail-header">
             <el-tag size="small">{{ getTypeLabel(currentTask.type) }}</el-tag>
@@ -111,9 +111,12 @@
                 <el-tag :type="mySubmission.status === 'pending' ? 'warning' : 'success'" size="small">
                   {{ getStatusTextByStatus(mySubmission.status) }}
                 </el-tag>
-                <span class="submission-time">提交于 {{ formatDate(mySubmission.submitted_at) }}</span>
+                <span class="submission-time">提交于 {{ formatDate(mySubmission.submitted_at || mySubmission.created_at) }}</span>
               </div>
-              <p class="submission-content">{{ mySubmission.generated_content }}</p>
+              <p v-if="mySubmission.generated_content" class="submission-content">{{ mySubmission.generated_content }}</p>
+              <div v-if="mySubmission.images && mySubmission.images.length > 0" class="submission-images">
+                <img v-for="(img, idx) in mySubmission.images" :key="idx" :src="img" class="submission-img" @click="previewImage(img)" />
+              </div>
               <div v-if="mySubmission.score !== null" class="submission-result">
                 <div class="score-display">
                   <span class="score-label">得分</span>
@@ -138,6 +141,24 @@
                   placeholder="请输入您的作业内容或粘贴生成的作品..."
                   :rows="5"
                 />
+              </el-form-item>
+              <el-form-item label="上传图片">
+                <el-upload
+                  :auto-upload="false"
+                  accept="image/*"
+                  list-type="picture-card"
+                  :on-change="handleImageChange"
+                  :on-remove="handleImageRemove"
+                  :file-list="submitForm.fileList"
+                  limit="5"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </el-upload>
+                <div class="upload-tip">支持 jpg/png/gif，最多 5 张</div>
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" class="gradient-btn" @click="submitAssignment" :loading="isSubmitting">
@@ -183,7 +204,9 @@ const filterTabs = [
 ]
 
 const submitForm = reactive({
-  content: ''
+  content: '',
+  fileList: [],
+  images: []
 })
 
 const typeLabels = {
@@ -253,7 +276,7 @@ const getTaskStatus = (task) => {
     return 'pending'
   }
 
-  return submission.status
+  return submission.status || 'submitted'
 }
 
 const getStatusText = (task) => {
@@ -317,8 +340,43 @@ const loadSubmissions = async () => {
   }
 }
 
+const handleImageChange = (file) => {
+  if (!file.raw.type.startsWith('image/')) {
+    ElMessage.warning('只能上传图片文件')
+    submitForm.fileList.pop()
+    return
+  }
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    submitForm.images.push(e.target.result)
+  }
+  reader.readAsDataURL(file.raw)
+}
+
+const handleImageRemove = (file) => {
+  const idx = submitForm.fileList.indexOf(file)
+  if (idx > -1) {
+    submitForm.images.splice(idx, 1)
+  }
+}
+
+const previewImage = (src) => {
+  const img = new Image()
+  img.src = src
+  img.style.cssText = 'max-width:90vw;max-height:90vh;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);cursor:pointer;'
+  const mask = document.createElement('div')
+  mask.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9998;'
+  img.onclick = () => { document.body.removeChild(img); document.body.removeChild(mask) }
+  mask.onclick = () => { document.body.removeChild(img); document.body.removeChild(mask) }
+  document.body.appendChild(mask)
+  document.body.appendChild(img)
+}
+
 const openTaskDetail = (task) => {
   currentTask.value = task
+  submitForm.content = ''
+  submitForm.fileList = []
+  submitForm.images = []
   showDetail.value = true
 }
 
@@ -333,11 +391,14 @@ const submitAssignment = async () => {
   try {
     await API.submitSubmission({
       task_id: currentTask.value.id,
-      generated_content: submitForm.content
+      generated_content: submitForm.content,
+      images: submitForm.images
     })
 
     ElMessage.success('提交成功')
     submitForm.content = ''
+    submitForm.fileList = []
+    submitForm.images = []
     await loadSubmissions()
   } catch (error) {
     ElMessage.error(error.message || '提交失败')
@@ -679,5 +740,54 @@ onMounted(() => {
 
 .no-submit-hint p {
   margin: 0;
+}
+
+.upload-tip {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.submission-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.submission-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid var(--color-border);
+}
+
+.submission-img:hover {
+  transform: scale(1.05);
+}
+
+:deep(.el-upload--picture-card) {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-glass);
+  border: 2px dashed var(--color-border);
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+
+:deep(.el-upload--picture-card:hover) {
+  border-color: var(--color-primary-light);
+}
+
+:deep(.el-upload-list--picture-card .el-upload-list__item) {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
 }
 </style>

@@ -130,7 +130,7 @@ const API = {
       return (localGet('submissions') || []).filter(s => s.task_id === taskId)
     }
     if (path === 'api/submissions') {
-      if (method === 'POST') { const subs = localGet('submissions') || []; subs.push({ ...body, id: Date.now(), created_at: new Date().toISOString(), student_id: user?.id }); localSet('submissions', subs); return subs[subs.length - 1] }
+      if (method === 'POST') { const subs = localGet('submissions') || []; const now = new Date().toISOString(); subs.push({ ...body, id: Date.now(), created_at: now, submitted_at: now, status: 'submitted', student_id: user?.id }); localSet('submissions', subs); return subs[subs.length - 1] }
     }
     if (path === 'api/submissions/my') {
       return (localGet('submissions') || []).filter(s => s.student_id === user?.id)
@@ -139,7 +139,7 @@ const API = {
       const sid = parseInt(path.split('/')[2])
       const subs = localGet('submissions') || []
       const i = subs.findIndex(s => s.id === sid)
-      if (i >= 0) { subs[i] = { ...subs[i], grade: body.grade, feedback: body.feedback, graded_at: new Date().toISOString() }; localSet('submissions', subs); return subs[i] }
+      if (i >= 0) { subs[i] = { ...subs[i], status: 'completed', score: body.grade || body.score, comment: body.feedback || body.comment, graded_at: new Date().toISOString() }; localSet('submissions', subs); return subs[i] }
     }
     if (path === 'api/resources') {
       if (method === 'GET') { const cat = new URLSearchParams(url.split('?')[1]).get('category'); const res = localGet('resources') || []; return cat ? res.filter(r => r.category === cat) : res }
