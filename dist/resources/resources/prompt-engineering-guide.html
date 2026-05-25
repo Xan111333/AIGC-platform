@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AIGC提示词工程速查表</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.7; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  h1 { text-align: center; color: #4f46e5; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+  h2 { color: #4f46e5; font-size: 20px; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #eef2ff; }
+  h3 { color: #374151; font-size: 16px; margin: 18px 0 10px; }
+  .tip-box { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 14px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .warn-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .example { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin: 10px 0; font-family: "Courier New", monospace; font-size: 13px; }
+  .good { color: #059669; }
+  .bad { color: #dc2626; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; font-size: 14px; }
+  th { background: #f9fafb; font-weight: 600; color: #374151; }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  .tag { display: inline-block; background: #eef2ff; color: #4f46e5; padding: 2px 10px; border-radius: 12px; font-size: 12px; margin: 2px; }
+  .footer { text-align: center; color: #9ca3af; margin-top: 30px; font-size: 13px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AIGC 提示词工程速查表</h1>
+  <p class="subtitle">AIGC Training Platform | 快速掌握 AI 对话与生成的核心技巧</p>
+
+  <h2>1. 提示词基础结构</h2>
+  <p>一个高质量的提示词通常包含以下要素：</p>
+  <table>
+    <tr><th>要素</th><th>说明</th><th>示例</th></tr>
+    <tr><td><strong>角色设定</strong></td><td>告诉 AI 你希望它扮演什么角色</td><td>"你是一位资深的UI设计专家..."</td></tr>
+    <tr><td><strong>任务描述</strong></td><td>明确你要 AI 完成什么任务</td><td>"请帮我设计一个移动端登录页面..."</td></tr>
+    <tr><td><strong>上下文信息</strong></td><td>提供背景、约束条件</td><td>"目标用户为18-25岁的年轻群体..."</td></tr>
+    <tr><td><strong>输出格式</strong></td><td>指定期望的输出形式</td><td>"请以Markdown表格形式输出..."</td></tr>
+    <tr><td><strong>示例参考</strong></td><td>提供好坏样例帮助理解</td><td>"参考以下风格：..."</td></tr>
+  </table>
+
+  <h2>2. 文本生成提示词技巧</h2>
+
+  <h3>技巧一：使用分隔符区分内容</h3>
+  <div class="example">
+    <span class="good">好：</span>请总结以下文章的核心观点：<br>
+    ---<br>
+    [文章内容]<br>
+    ---<br>
+    <span class="bad">差：</span>帮我总结一下这篇文章 blahblahblah 一大段文字混在一起...
+  </div>
+
+  <h3>技巧二：指定输出长度和格式</h3>
+  <div class="example">
+    <span class="good">好：</span>请用不超过200字总结，分3个要点，每个要点用一句话概括<br>
+    <span class="bad">差：</span>总结一下
+  </div>
+
+  <h3>技巧三：分步思考（Chain of Thought）</h3>
+  <div class="example">
+    <span class="good">好：</span>请一步步分析这个问题：<br>
+    第一步：理解题目要求<br>
+    第二步：列出关键变量<br>
+    第三步：建立数学模型<br>
+    第四步：求解并验证
+  </div>
+
+  <h3>技巧四：提供 Few-Shot 示例</h3>
+  <div class="example">
+    <span class="good">好：</span>请将以下英文翻译为中文，保持技术术语的准确性：<br>
+    示例1：Machine Learning -> 机器学习<br>
+    示例2：Deep Learning -> 深度学习<br>
+    请翻译：Natural Language Processing -> ?
+  </div>
+
+  <h2>3. 图像生成提示词技巧</h2>
+
+  <h3>提示词公式</h3>
+  <div class="tip-box">
+    <strong>主体 + 风格 + 场景/背景 + 光照 + 色调 + 画质 + 构图</strong>
+  </div>
+
+  <table>
+    <tr><th>维度</th><th>关键词示例</th></tr>
+    <tr><td>画风</td><td>写实摄影、水彩画、油画、赛博朋克、日系动漫、扁平插画、3D渲染</td></tr>
+    <tr><td>光照</td><td>黄金时刻光线、逆光、柔和自然光、霓虹灯光、体积光、丁达尔效应</td></tr>
+    <tr><td>镜头</td><td>特写镜头、广角镜头、鸟瞰视角、低角度拍摄、微距摄影</td></tr>
+    <tr><td>画质</td><td>8K超高清、4K、电影级画质、精细细节、锐利对焦</td></tr>
+    <tr><td>色调</td><td>暖色调、冷色调、莫兰迪色系、高饱和度、黑白、复古胶片</td></tr>
+  </table>
+
+  <div class="example">
+    <span class="good">好：</span>一只橘猫坐在窗台上，阳光透过窗户洒落，毛茸茸的尾巴微微翘起，背景是模糊的城市天际线，柔和暖色调，特写镜头，8K超高清，写实摄影风格<br><br>
+    <span class="bad">差：</span>一只猫
+  </div>
+
+  <h2>4. 常见场景模板</h2>
+
+  <h3>内容创作</h3>
+  <div class="example">
+    你是一位资深[领域]内容创作者。请围绕[主题]写一篇[类型]文章，<br>
+    要求：<br>
+    1. 目标读者：[人群]<br>
+    2. 字数：[范围]字<br>
+    3. 语气风格：[正式/轻松/幽默]<br>
+    4. 结构要求：包含标题、引言、正文分段、总结<br>
+    5. 核心观点：[关键论点]
+  </div>
+
+  <h3>代码生成</h3>
+  <div class="example">
+    请使用[编程语言]实现[功能描述]，要求：<br>
+    1. 使用[框架/库]版本[版本号]<br>
+    2. 代码需包含详细注释<br>
+    3. 遵循[设计模式/规范]<br>
+    4. 包含错误处理<br>
+    5. 提供使用示例
+  </div>
+
+  <h3>数据分析</h3>
+  <div class="example">
+    我有以下数据：[数据描述]<br>
+    请帮我：<br>
+    1. 分析数据的整体趋势<br>
+    2. 识别关键异常值<br>
+    3. 提出3条有价值的洞察<br>
+    4. 给出具体的行动建议
+  </div>
+
+  <h2>5. 避坑指南</h2>
+  <div class="warn-box">
+    <strong>常见错误：</strong>
+    <ul>
+      <li>提示词太模糊 —— AI 只能猜你的意图</li>
+      <li>一次提太多要求 —— 分解为多轮对话</li>
+      <li>不验证输出 —— AI 会"自信地错误"，务必交叉验证</li>
+      <li>忽略上下文长度 —— 对话太长时总结之前的内容重新开始</li>
+      <li>不提供负面约束 —— 说"不要什么"和说"要什么"同样重要</li>
+    </ul>
+  </div>
+
+  <h2>6. 进阶技巧</h2>
+  <table>
+    <tr><th>技巧</th><th>说明</th><th>适用场景</th></tr>
+    <tr><td>角色扮演法</td><td>让AI扮演特定专家角色</td><td>需要专业领域回答时</td></tr>
+    <tr><td>反向提问法</td><td>先问AI需要哪些信息</td><td>不确定如何描述需求时</td></tr>
+    <tr><td>迭代优化法</td><td>根据输出反馈调整提示词</td><td>追求高质量输出时</td></tr>
+    <tr><td>多模型对比法</td><td>同一提示词在不同模型间对比</td><td>选择最佳工具时</td></tr>
+    <tr><td>组合提示法</td><td>将复杂任务拆为多个子提示词</td><td>处理复杂项目时</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <strong>核心原则：</strong>提示词工程的本质是<strong>沟通</strong>。你与 AI 沟通得越清晰、越具体，AI 返回的结果就越精确、越有用。把 AI 当作一个聪明但需要明确指令的助手。
+  </div>
+
+  <div class="footer">
+    AIGC实训平台 | AIGC Training Platform | 2026
+  </div>
+</div>
+</body>
+</html>

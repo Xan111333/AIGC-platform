@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AIGC实训平台操作手册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.7; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  h1 { text-align: center; color: #059669; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+  h2 { color: #059669; font-size: 20px; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #ecfdf5; }
+  h3 { color: #374151; font-size: 16px; margin: 18px 0 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; font-size: 14px; }
+  th { background: #f9fafb; font-weight: 600; color: #374151; }
+  .tip-box { background: #ecfdf5; border-left: 4px solid #10b981; padding: 14px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .warn-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .section { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 14px 0; }
+  .section-title { font-weight: 700; font-size: 16px; color: #059669; margin-bottom: 10px; }
+  .step-list { counter-reset: step; padding-left: 0; list-style: none; }
+  .step-list li { counter-increment: step; padding: 8px 0 8px 40px; position: relative; }
+  .step-list li::before { content: counter(step); position: absolute; left: 0; top: 8px; width: 26px; height: 26px; line-height: 26px; text-align: center; background: #059669; color: #fff; border-radius: 50%; font-size: 13px; font-weight: 700; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 6px 0; }
+  .footer { text-align: center; color: #9ca3af; margin-top: 30px; font-size: 13px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+  kbd { background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 6px; font-size: 12px; font-family: monospace; }
+  .role-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; margin-right: 6px; }
+  .role-student { background: #dbeafe; color: #1e40af; }
+  .role-teacher { background: #fce7f3; color: #9d174d; }
+  .role-admin { background: #fef3c7; color: #92400e; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AIGC 实训平台操作手册</h1>
+  <p class="subtitle">AIGC Training Platform | 平台功能使用完全指南</p>
+
+  <h2>1. 平台概览</h2>
+  <p>AIGC实训平台是一个集AI文本生成、图像生成、视频生成、音频生成等功能于一体的在线学习与创作平台。平台提供学生端、教师端和管理员三种角色。</p>
+
+  <table>
+    <tr><th>角色</th><th>主要功能</th></tr>
+    <tr><td><span class="role-badge role-student">学生</span></td><td>使用AI创作工具、完成实训任务、查看学习资源、提交作业</td></tr>
+    <tr><td><span class="role-badge role-teacher">教师</span></td><td>管理实训任务、批改学生作业、上传学习资源、查看学生进度</td></tr>
+    <tr><td><span class="role-badge role-admin">管理员</span></td><td>用户管理、系统配置、内容审核、日志查看</td></tr>
+  </table>
+
+  <h2>2. 快速开始</h2>
+
+  <div class="section">
+    <div class="section-title">2.1 注册与登录</div>
+    <ol class="step-list">
+      <li>打开平台首页，点击"注册"按钮</li>
+      <li>填写用户名、邮箱、密码等信息完成注册</li>
+      <li>使用注册的账号密码登录平台</li>
+      <li>登录后进入仪表盘，根据角色看到对应的功能菜单</li>
+    </ol>
+    <div class="tip-box">
+      <strong>提示：</strong>演示账号 —— 管理员: admin / admin123
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2.2 仪表盘导航</div>
+    <p>登录后，左侧菜单栏提供以下功能入口：</p>
+    <table>
+      <tr><th>功能</th><th>说明</th><th>可用角色</th></tr>
+      <tr><td>仪表盘</td><td>查看平台概览和使用统计</td><td>全部</td></tr>
+      <tr><td>文本生成</td><td>使用AI进行文本创作</td><td>全部</td></tr>
+      <tr><td>图像生成</td><td>使用AI进行图像创作</td><td>全部</td></tr>
+      <tr><td>视频生成</td><td>使用AI进行视频创作</td><td>全部</td></tr>
+      <tr><td>音频生成</td><td>使用AI进行音频创作</td><td>全部</td></tr>
+      <tr><td>学习资源</td><td>浏览和下载学习资料</td><td>全部</td></tr>
+      <tr><td>我的作品</td><td>查看和管理个人创作记录</td><td>全部</td></tr>
+      <tr><td>实训任务</td><td>查看和提交实训作业</td><td><span class="role-badge role-student">学生</span></td></tr>
+      <tr><td>任务管理</td><td>创建和管理实训任务</td><td><span class="role-badge role-teacher">教师</span></td></tr>
+      <tr><td>学生进度</td><td>查看学生学习进度</td><td><span class="role-badge role-student">学生</span></td></tr>
+      <tr><td>系统管理</td><td>用户管理、系统配置等</td><td><span class="role-badge role-admin">管理员</span></td></tr>
+    </table>
+  </div>
+
+  <h2>3. AI 创作功能</h2>
+
+  <div class="section">
+    <div class="section-title">3.1 文本生成</div>
+    <ol class="step-list">
+      <li>在左侧菜单点击"文本生成"</li>
+      <li>在输入框中输入你的需求描述（提示词）</li>
+      <li>选择生成模式（创意写作/摘要提取/翻译等）</li>
+      <li>点击"生成"按钮，等待AI返回结果</li>
+      <li>查看结果后可以复制、保存或重新生成</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3.2 图像生成</div>
+    <ol class="step-list">
+      <li>在左侧菜单点击"图像生成"</li>
+      <li>输入图像描述（包含主体、风格、画面等信息）</li>
+      <li>选择图像比例（1:1 / 16:9 / 9:16等）</li>
+      <li>点击"生成"按钮，等待AI生成图像</li>
+      <li>满意后可下载图像，不满意可调整提示词重新生成</li>
+    </ol>
+    <div class="tip-box">
+      <strong>技巧：</strong>参考学习资源中的"提示词工程速查表"和"图像生成参数指南"来提升生成质量。
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3.3 视频生成</div>
+    <ol class="step-list">
+      <li>在左侧菜单点击"视频生成"</li>
+      <li>输入视频场景描述</li>
+      <li>设置视频参数（时长、比例等）</li>
+      <li>点击"生成"并等待处理</li>
+      <li>预览视频效果，满意后下载</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3.4 音频生成</div>
+    <ol class="step-list">
+      <li>在左侧菜单点击"音频生成"</li>
+      <li>输入文字内容或选择音频类型</li>
+      <li>选择语音风格或音乐风格</li>
+      <li>点击"生成"并等待处理</li>
+      <li>试听效果，满意后下载</li>
+    </ol>
+  </div>
+
+  <h2>4. 实训任务（学生端）</h2>
+
+  <div class="section">
+    <div class="section-title">4.1 查看任务列表</div>
+    <ol class="step-list">
+      <li>点击"实训任务"进入任务页面</li>
+      <li>查看所有待完成、已提交、已批改的任务</li>
+      <li>点击任务卡片查看任务详情</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4.2 提交作业</div>
+    <ol class="step-list">
+      <li>在任务详情中查看任务要求</li>
+      <li>使用AI工具完成创作内容</li>
+      <li>在"提交作业"区域填写生成内容描述</li>
+      <li>上传相关图片（支持最多5张图片）</li>
+      <li>点击"提交"完成作业提交</li>
+    </ol>
+    <div class="warn-box">
+      <strong>注意：</strong>提交后无法修改，请确认内容无误后再提交。
+    </div>
+  </div>
+
+  <h2>5. 任务管理（教师端）</h2>
+
+  <div class="section">
+    <div class="section-title">5.1 创建任务</div>
+    <ol class="step-list">
+      <li>点击"任务管理"进入管理页面</li>
+      <li>点击"创建任务"按钮</li>
+      <li>填写任务标题、描述、要求和截止日期</li>
+      <li>点击"发布"完成任务创建</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">5.2 批改作业</div>
+    <ol class="step-list">
+      <li>在任务列表中找到目标任务</li>
+      <li>点击"查看提交"查看学生提交记录</li>
+      <li>查看学生的生成内容和上传图片</li>
+      <li>给出评分和评语</li>
+      <li>点击"提交评分"完成批改</li>
+    </ol>
+  </div>
+
+  <h2>6. 学习资源</h2>
+
+  <div class="section">
+    <div class="section-title">6.1 浏览资源</div>
+    <ol class="step-list">
+      <li>点击"学习资源"进入资源中心</li>
+      <li>通过分类标签筛选感兴趣的资源类型</li>
+      <li>使用搜索框快速查找资源</li>
+      <li>点击资源卡片查看详情</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">6.2 下载资源</div>
+    <ol class="step-list">
+      <li>在资源详情页或资源卡片上找到"下载"按钮</li>
+      <li>点击下载按钮获取资源文件</li>
+      <li>文件将自动下载到本地</li>
+    </ol>
+    <div class="tip-box">
+      <strong>可用资源：</strong>提示词工程速查表、图像生成参数指南、AIGC学习路线图、AI工具速查手册、视频生成入门教程、平台操作手册等。
+    </div>
+  </div>
+
+  <h2>7. 常见问题</h2>
+  <table>
+    <tr><th>问题</th><th>解决方案</th></tr>
+    <tr><td>AI生成结果不满意</td><td>优化提示词描述，参考学习资源中的提示词技巧</td></tr>
+    <tr><td>图像生成时间过长</td><td>尝试简化描述或降低图像分辨率</td></tr>
+    <tr><td>找不到提交记录</td><td>检查是否成功提交，刷新页面重新查看</td></tr>
+    <tr><td>对话框无法打开</td><td>刷新页面或清除浏览器缓存后重试</td></tr>
+    <tr><td>图片上传失败</td><td>检查图片格式（支持jpg/png）和大小限制</td></tr>
+  </table>
+
+  <div class="footer">
+    AIGC实训平台 | AIGC Training Platform | 2026
+  </div>
+</div>
+</body>
+</html>

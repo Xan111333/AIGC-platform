@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AIGC学习路线图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.7; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  h1 { text-align: center; color: #0891b2; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+  h2 { color: #0891b2; font-size: 20px; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #ecfeff; }
+
+  .phase { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin: 20px 0; }
+  .phase-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .phase-num { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .phase-1 .phase-num { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+  .phase-2 .phase-num { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+  .phase-3 .phase-num { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .phase-4 .phase-num { background: linear-gradient(135deg, #10b981, #059669); }
+  .phase-5 .phase-num { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  .phase-title { font-size: 20px; font-weight: 700; color: #1f2937; }
+  .phase-time { font-size: 13px; color: #6b7280; }
+  .phase-desc { color: #4b5563; margin-bottom: 16px; }
+
+  .topic-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .topic { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; }
+  .topic-title { font-weight: 600; font-size: 14px; color: #374151; margin-bottom: 4px; }
+  .topic-desc { font-size: 12px; color: #9ca3af; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
+  .tag-essential { background: #fee2e2; color: #991b1b; }
+  .tag-recommended { background: #dbeafe; color: #1e40af; }
+  .tag-optional { background: #f3f4f6; color: #6b7280; }
+
+  .tip-box { background: #ecfeff; border-left: 4px solid #0891b2; padding: 14px 18px; margin: 14px 0; border-radius: 0 8px 8px 0; }
+
+  .roadmap-line { position: relative; padding-left: 30px; margin-left: 21px; }
+  .roadmap-line::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, #0891b2, #8b5cf6, #f59e0b, #10b981, #ef4444); }
+
+  .resource-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px 18px; margin: 10px 0; }
+  .resource-box h4 { color: #92400e; font-size: 14px; margin-bottom: 6px; }
+
+  @media (max-width: 600px) { .topic-list { grid-template-columns: 1fr; } }
+  .footer { text-align: center; color: #9ca3af; margin-top: 30px; font-size: 13px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AIGC 学习路线图</h1>
+  <p class="subtitle">AIGC Training Platform | 从零到精通的 AI 创作能力培养计划</p>
+
+  <div class="tip-box">
+    <strong>说明：</strong>本路线图按照由浅入深的顺序设计，每个阶段包含核心学习内容和实践项目。建议按顺序学习，但可根据自身情况灵活调整。
+  </div>
+
+  <div class="roadmap-line">
+
+    <div class="phase phase-1">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <div>
+          <div class="phase-title">AI 基础认知</div>
+          <div class="phase-time">第 1-2 周 | 入门阶段</div>
+        </div>
+      </div>
+      <div class="phase-desc">了解 AIGC 的基本概念、发展历程和核心应用场景，建立对 AI 生成内容的整体认知。</div>
+      <div class="topic-list">
+        <div class="topic">
+          <div class="topic-title">AIGC 概述 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">什么是 AIGC、技术原理概述、发展历程</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">主流 AI 模型 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">GPT系列、GLM系列、Stable Diffusion、CogView等</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">应用场景概览 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">文本生成、图像生成、音频生成、视频生成</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">伦理与安全 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">AI使用的伦理规范、版权问题、安全边界</div>
+        </div>
+      </div>
+      <div class="resource-box">
+        <h4>实践项目</h4>
+        体验本平台的文本生成和图像生成功能，尝试不同的提示词，感受 AI 生成效果。
+      </div>
+    </div>
+
+    <div class="phase phase-2">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <div>
+          <div class="phase-title">提示词工程</div>
+          <div class="phase-time">第 3-4 周 | 核心技能</div>
+        </div>
+      </div>
+      <div class="phase-desc">掌握与 AI 高效沟通的技巧，学会撰写高质量的提示词来获取理想的生成结果。</div>
+      <div class="topic-list">
+        <div class="topic">
+          <div class="topic-title">提示词结构 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">角色设定、任务描述、输出格式、约束条件</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">文本提示词 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">Chain of Thought、Few-Shot、角色扮演</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">图像提示词 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">画风描述、参数控制、负面提示词、构图引导</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">迭代优化 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">基于输出反馈优化提示词的策略</div>
+        </div>
+      </div>
+      <div class="resource-box">
+        <h4>实践项目</h4>
+        使用平台完成以下练习：1) 撰写3组不同风格的文本生成提示词并对比效果；2) 为同一主题设计5个不同的图像生成提示词。
+      </div>
+    </div>
+
+    <div class="phase phase-3">
+      <div class="phase-header">
+        <div class="phase-num">3</div>
+        <div>
+          <div class="phase-title">多模态创作实践</div>
+          <div class="phase-time">第 5-8 周 | 进阶阶段</div>
+        </div>
+      </div>
+      <div class="phase-desc">深入学习文本、图像、音频、视频等多种 AI 生成能力，并能将多种模态组合使用。</div>
+      <div class="topic-list">
+        <div class="topic">
+          <div class="topic-title">AI 文本创作 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">文章撰写、内容改写、摘要提取、翻译润色</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">AI 图像创作 <span class="tag tag-essential">必修</span></div>
+          <div class="topic-desc">风格迁移、图像修复、产品图、插画设计</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">AI 视频生成 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">文字转视频、图像转视频、视频编辑</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">AI 音频处理 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">语音合成、音频克隆、音乐生成</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">多模态协作 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">用AI生成文案 + AI生成配图 + AI制作视频</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">后处理技巧 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">图像放大、面部修复、背景替换</div>
+        </div>
+      </div>
+      <div class="resource-box">
+        <h4>实践项目</h4>
+        完成一个完整的 AIGC 创作项目：1) 用AI生成产品文案；2) 用AI设计产品宣传图；3) 用AI制作30秒宣传视频。提交综合作品集。
+      </div>
+    </div>
+
+    <div class="phase phase-4">
+      <div class="phase-header">
+        <div class="phase-num">4</div>
+        <div>
+          <div class="phase-title">行业应用深化</div>
+          <div class="phase-time">第 9-12 周 | 专业阶段</div>
+        </div>
+      </div>
+      <div class="phase-desc">了解 AIGC 在各行业的具体应用，选择感兴趣的方向深入学习。</div>
+      <div class="topic-list">
+        <div class="topic">
+          <div class="topic-title">电商与营销 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">商品图生成、营销文案、广告创意</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">教育与培训 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">课件制作、知识图谱、智能答疑</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">媒体与出版 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">新闻写作、配图生成、版面设计</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">设计与艺术 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">概念设计、UI原型、艺术创作</div>
+        </div>
+      </div>
+      <div class="resource-box">
+        <h4>实践项目</h4>
+        选择一个行业场景，完成一个端到端的 AIGC 应用案例，展示从需求分析到成果交付的全流程。
+      </div>
+    </div>
+
+    <div class="phase phase-5">
+      <div class="phase-header">
+        <div class="phase-num">5</div>
+        <div>
+          <div class="phase-title">创新与前沿</div>
+          <div class="phase-time">持续学习 | 高级阶段</div>
+        </div>
+      </div>
+      <div class="phase-desc">关注 AIGC 最新发展动态，参与创新实践，探索 AI 与其他技术的融合应用。</div>
+      <div class="topic-list">
+        <div class="topic">
+          <div class="topic-title">前沿技术追踪 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">Sora、Gemini、GPT-5等最新模型动态</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">AI Agent 开发 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">自主Agent、工作流编排、RAG技术</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">跨领域融合 <span class="tag tag-optional">选修</span></div>
+          <div class="topic-desc">AI+IoT、AI+XR、AI+数字孪生</div>
+        </div>
+        <div class="topic">
+          <div class="topic-title">作品集建设 <span class="tag tag-recommended">推荐</span></div>
+          <div class="topic-desc">整理优秀作品、建立个人AI创作品牌</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>学习建议</h2>
+  <div class="tip-box">
+    <strong>核心原则：</strong>
+    <ul style="margin-top: 8px;">
+      <li><strong>实践优先</strong> —— 每学一个知识点都要动手操作，光看不练等于没学</li>
+      <li><strong>善用平台</strong> —— 充分利用本平台的各项AI生成工具进行练习</li>
+      <li><strong>记录笔记</strong> —— 记录有效的提示词模板和参数组合</li>
+      <li><strong>持续关注</strong> —— AI 技术更新快，保持对新模型的敏感度</li>
+      <li><strong>交流分享</strong> —— 与同学讨论作品，互相学习提示词技巧</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    AIGC实训平台 | AIGC Training Platform | 2026
+  </div>
+</div>
+</body>
+</html>

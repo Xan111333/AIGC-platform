@@ -232,7 +232,7 @@ const mockResources = [
 const loadResources = async () => {
   try {
     const result = await API.getResources(activeCategory.value === 'all' ? null : activeCategory.value)
-    resources.value = result
+    resources.value = result && result.length > 0 ? result : mockResources.filter(r => activeCategory.value === 'all' || r.category === activeCategory.value)
   } catch (error) {
     console.error('Load resources error:', error)
     resources.value = mockResources.filter(r => activeCategory.value === 'all' || r.category === activeCategory.value)
