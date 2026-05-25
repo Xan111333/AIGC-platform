@@ -98,20 +98,26 @@
         </el-form>
       </div>
 
-      <el-dialog :title="`${currentTask?.title || '任务'} - 学生提交`" :visible.sync="showSubmissions" width="700px">
+      <el-dialog :title="`${currentTask?.title || '任务'} - 学生提交`" v-model="showSubmissions" width="700px">
         <div v-if="submissions.length === 0" class="empty-state-in-dialog">
           <p>暂无学生提交</p>
         </div>
         <div v-else class="submissions-list">
           <div v-for="submission in submissions" :key="submission.id" class="submission-item">
             <div class="submission-header">
-              <span class="student-name">{{ submission.student_name }}</span>
-              <el-tag :type="submission.status === 'pending' ? 'warning' : 'success'" size="small">
-                {{ getStatusLabel(submission.status) }}
-              </el-tag>
+              <span class="student-name">{{ submission.student_name || '未知学生' }}</span>
+              <div class="submission-meta">
+                <span v-if="submission.submitted_at" class="submit-time">{{ formatDate(submission.submitted_at) }}</span>
+                <el-tag :type="submission.status === 'completed' ? 'success' : 'warning'" size="small">
+                  {{ getStatusLabel(submission.status) }}
+                </el-tag>
+              </div>
             </div>
             <p v-if="submission.generated_content" class="submission-content">{{ submission.generated_content }}</p>
-            <div v-if="submission.score !== null" class="submission-result">
+            <div v-if="submission.images && submission.images.length > 0" class="submission-images">
+              <img v-for="(img, idx) in submission.images" :key="idx" :src="img" class="submission-img" @click="previewImage(img)" />
+            </div>
+            <div v-if="submission.score !== null && submission.score !== undefined" class="submission-result">
               <div class="score-display">
                 <span class="score-label">评分</span>
                 <span class="score-value">{{ submission.score }}</span>
@@ -126,7 +132,7 @@
         </div>
       </el-dialog>
 
-      <el-dialog :title="`评分 - ${gradingSubmission?.student_name}`" :visible.sync="showGradeModal" width="500px">
+      <el-dialog :title="`评分 - ${gradingSubmission?.student_name || '学生'}`" v-model="showGradeModal" width="500px">
         <el-form :model="gradeForm" class="grade-form">
           <el-form-item label="分数" required>
             <el-input-number v-model="gradeForm.score" :min="0" :max="100" />
@@ -187,6 +193,7 @@ const getTypeLabel = (type) => typeLabels[type] || type
 
 const statusLabels = {
   pending: '待批改',
+  submitted: '已提交',
   completed: '已批改'
 }
 
@@ -287,6 +294,18 @@ const viewSubmissions = async (task) => {
   } catch (error) {
     ElMessage.error('加载提交列表失败')
   }
+}
+
+const previewImage = (src) => {
+  const img = new Image()
+  img.src = src
+  img.style.cssText = 'max-width:90vw;max-height:90vh;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);cursor:pointer;'
+  const mask = document.createElement('div')
+  mask.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9998;'
+  img.onclick = () => { document.body.removeChild(img); document.body.removeChild(mask) }
+  mask.onclick = () => { document.body.removeChild(img); document.body.removeChild(mask) }
+  document.body.appendChild(mask)
+  document.body.appendChild(img)
 }
 
 const openGradeModal = (submission) => {
@@ -539,5 +558,37 @@ onMounted(() => {
 
 .grade-form {
   padding: 10px 0;
+}
+
+.submission-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.submit-time {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.submission-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.submission-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid var(--color-border);
+}
+
+.submission-img:hover {
+  transform: scale(1.08);
 }
 </style>

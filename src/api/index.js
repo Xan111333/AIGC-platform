@@ -127,13 +127,22 @@ const API = {
     }
     if (path.match(/^api\/tasks\/\d+\/submissions$/)) {
       const taskId = parseInt(path.split('/')[2])
-      return (localGet('submissions') || []).filter(s => s.task_id === taskId)
+      const subs = (localGet('submissions') || []).filter(s => s.task_id === taskId)
+      const users = localGet('users') || {}
+      subs.forEach(s => {
+        const user = Object.values(users).find(u => u.id === s.student_id)
+        if (user) s.student_name = user.full_name || user.username
+        if (!s.status) s.status = 'submitted'
+      })
+      return subs
     }
     if (path === 'api/submissions') {
       if (method === 'POST') { const subs = localGet('submissions') || []; const now = new Date().toISOString(); subs.push({ ...body, id: Date.now(), created_at: now, submitted_at: now, status: 'submitted', student_id: user?.id }); localSet('submissions', subs); return subs[subs.length - 1] }
     }
     if (path === 'api/submissions/my') {
-      return (localGet('submissions') || []).filter(s => s.student_id === user?.id)
+      const subs = (localGet('submissions') || []).filter(s => s.student_id === user?.id)
+      subs.forEach(s => { if (!s.status) s.status = 'submitted' })
+      return subs
     }
     if (path.match(/^api\/submissions\/\d+\/grade$/)) {
       const sid = parseInt(path.split('/')[2])
