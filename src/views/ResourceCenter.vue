@@ -43,6 +43,7 @@
           <div class="resource-cover">
             <img :src="resource.cover_url" :alt="resource.title" />
             <div class="category-badge">{{ resource.category_name }}</div>
+            <div v-if="resource.file_url" class="download-badge">可下载</div>
           </div>
           <div class="resource-info">
             <h3 class="resource-title">{{ resource.title }}</h3>
@@ -70,7 +71,7 @@
         </div>
       </div>
 
-      <el-dialog title="资源详情" :visible.sync="showDetailModal" width="600px">
+      <el-dialog title="资源详情" v-model="showDetailModal" width="600px">
         <div v-if="selectedResource" class="resource-detail">
           <img :src="selectedResource.cover_url" :alt="selectedResource.title" class="detail-cover" />
           <h2>{{ selectedResource.title }}</h2>
@@ -86,7 +87,7 @@
         </div>
       </el-dialog>
 
-      <el-dialog title="上传资源" :visible.sync="showUploadModal" width="500px">
+      <el-dialog title="上传资源" v-model="showUploadModal" width="500px">
         <el-form :model="uploadForm" label-width="100px">
           <el-form-item label="资源标题">
             <el-input v-model="uploadForm.title" placeholder="请输入资源标题" />
@@ -138,58 +139,93 @@ const uploadForm = reactive({
   cover_url: ''
 })
 
+// Base URL for public resource files
+const resBase = '/AIGC-platform/resources/'
+
 const mockResources = [
   {
     id: 1,
-    title: 'AIGC文本生成入门教程',
-    description: '从零开始学习AIGC文本生成技术，包括提示词设计、参数调优、应用场景等内容。',
+    title: 'AIGC提示词工程速查表',
+    description: '快速掌握AI对话与生成的核心提示词技巧，涵盖文本生成、图像生成、Few-Shot、Chain of Thought等高级技巧，附带丰富的实战模板。',
     category: 'tutorial',
     category_name: '教程',
-    file_url: '',
-    cover_url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20text%20generation%20tutorial%20cover&image_size=landscape_16_9',
+    file_url: resBase + 'prompt-engineering-guide.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/prompt-eng/640/360',
     uploader_id: 1,
     uploader_name: '张老师',
-    view_count: 156,
+    view_count: 256,
     created_at: '2024-01-15T10:00:00'
   },
   {
     id: 2,
-    title: '图像生成实战案例集',
-    description: '包含10个经典图像生成案例，涵盖风格迁移、超分辨率、图像修复等技术。',
-    category: 'case',
-    category_name: '案例',
-    file_url: '',
-    cover_url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20image%20generation%20case%20study&image_size=landscape_16_9',
+    title: 'AIGC图像生成参数指南',
+    description: '深入解析图像生成的核心参数：采样步数、CFG引导系数、图像尺寸、随机种子等，以及权重调节和负面提示词的使用方法。',
+    category: 'tutorial',
+    category_name: '教程',
+    file_url: resBase + 'image-generation-guide.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/img-gen/640/360',
     uploader_id: 1,
     uploader_name: '李老师',
-    view_count: 89,
+    view_count: 189,
     created_at: '2024-01-18T14:30:00'
   },
   {
     id: 3,
-    title: 'AIGC技术白皮书',
-    description: '全面介绍AIGC技术原理、发展趋势和应用前景的权威文档。',
-    category: 'document',
-    category_name: '文档',
-    file_url: '',
-    cover_url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=technical%20whitepaper%20AI%20technology&image_size=landscape_16_9',
-    uploader_id: 2,
-    uploader_name: '王教授',
-    view_count: 234,
-    created_at: '2024-01-20T09:00:00'
-  },
-  {
-    id: 4,
-    title: '视频生成技术详解',
-    description: '深入讲解AI视频生成技术原理，包含多个实战演示视频。',
+    title: 'AI视频生成入门教程',
+    description: '从文字到视频的完整创作指南，包含文生视频、图生视频的实战步骤，以及后期处理和视频描述词模板库。',
     category: 'video',
     category_name: '视频',
-    file_url: '',
-    cover_url: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=AI%20video%20generation%20technology&image_size=landscape_16_9',
+    file_url: resBase + 'video-generation-tutorial.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/vid-gen/640/360',
     uploader_id: 1,
     uploader_name: '张老师',
     view_count: 178,
     created_at: '2024-01-22T16:00:00'
+  },
+  {
+    id: 4,
+    title: 'AIGC学习路线图',
+    description: '从零到精通的AI创作能力培养计划，包含5个学习阶段的详细规划、核心学习内容和实践项目，适合系统学习。',
+    category: 'document',
+    category_name: '文档',
+    file_url: resBase + 'aigc-learning-roadmap.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/roadmap/640/360',
+    uploader_id: 2,
+    uploader_name: '王教授',
+    view_count: 312,
+    created_at: '2024-01-20T09:00:00'
+  },
+  {
+    id: 5,
+    title: 'AIGC常用工具速查手册',
+    description: '一文汇总文本、图像、音频、视频和效率工具，涵盖ChatGPT、Midjourney、Sora、可灵AI等主流工具的功能对比和选择建议。',
+    category: 'document',
+    category_name: '文档',
+    file_url: resBase + 'ai-tools-handbook.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/ai-tools/640/360',
+    uploader_id: 2,
+    uploader_name: '王教授',
+    view_count: 267,
+    created_at: '2024-02-01T11:00:00'
+  },
+  {
+    id: 6,
+    title: 'AIGC实训平台操作手册',
+    description: '平台功能使用完全指南，涵盖注册登录、AI创作、实训任务提交、学习资源下载等所有功能的详细操作步骤和常见问题解答。',
+    category: 'case',
+    category_name: '案例',
+    file_url: resBase + 'platform-user-guide.html',
+    file_size: 'HTML',
+    cover_url: 'https://picsum.photos/seed/platform/640/360',
+    uploader_id: 1,
+    uploader_name: '张老师',
+    view_count: 198,
+    created_at: '2024-02-05T14:00:00'
   }
 ]
 
@@ -253,11 +289,12 @@ const downloadResource = (resource) => {
   if (resource.file_url) {
     const link = document.createElement('a')
     link.href = resource.file_url
-    link.download = resource.title
+    link.download = resource.title + '.html'
+    link.target = '_blank'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-    ElMessage.success('下载成功')
+    ElMessage.success('开始下载：' + resource.title)
   } else {
     ElMessage.info('该资源暂无下载链接')
   }
@@ -411,6 +448,18 @@ onMounted(() => {
   font-size: 12px;
   font-weight: 500;
   color: var(--color-text-primary);
+}
+
+.download-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
 }
 
 .resource-info {
