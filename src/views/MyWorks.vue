@@ -157,7 +157,7 @@
         </div>
       </div>
 
-      <el-dialog :title="previewWorkData?.title || '作品预览'" :visible.sync="showPreviewModal" width="700px">
+      <el-dialog :title="previewWorkData?.title || '作品预览'" v-model="showPreviewModal" width="700px">
         <div v-if="previewWorkData" class="preview-content">
           <div v-if="previewWorkData.type === 'text'" class="text-content">
             <pre>{{ previewWorkData.content }}</pre>
