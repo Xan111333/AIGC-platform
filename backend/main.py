@@ -7,8 +7,9 @@ from app.routes.text import router as text_router
 from app.routes.image import router as image_router
 from app.routes.audio import router as audio_router
 from app.routes.tasks import router as tasks_router
+from app.database import init_db, SessionLocal
 from app.utils.local_storage import init_storage
-from app.database import init_db
+from app.seed_tasks import seed_tasks
 
 app = FastAPI(
     title="AIGC 实训平台 API",
@@ -40,6 +41,11 @@ def read_root():
 async def on_startup():
     init_db()
     init_storage()
+    db = SessionLocal()
+    try:
+        seed_tasks(db)
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     import uvicorn
