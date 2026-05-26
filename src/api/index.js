@@ -47,7 +47,8 @@ function initDefaultUsers() {
   localSet('image_history', [])
   localSet('video_history', [])
   localSet('audio_history', [])
-  localSet('system_config', { site_name: 'AIGC 实训平台', site_description: '探索 AI 创作的无限可能', max_daily_generations: 50, allow_registration: true, require_content_review: false, api_key_status: { zhipu: true } })
+  localSet('content_reviews', [])
+  localSet('system_config', { site_name: 'AIGC 实训平台', site_description: '探索 AI 创作的无限可能', max_daily_generations: 50, allow_registration: true, require_content_review: true, api_key_status: { zhipu: true } })
 }
 initDefaultUsers()
 // 如果任务表为空或缺少默认题目，自动填充（使用版本标记防止重复）
@@ -61,11 +62,49 @@ if (!seededVersion || seededVersion < TASK_SEED_VERSION) {
   localSet('tasks', [...defaultTasks, ...userTasks])
   localSet('task_seed_version', TASK_SEED_VERSION)
 }
+// 将历史生成记录迁移到内容审核表（只执行一次）
+const CONTENT_REVIEW_MIGRATED = localGet('content_review_migrated')
+if (!CONTENT_REVIEW_MIGRATED) {
+  const reviews = localGet('content_reviews') || []
+  const users = localGet('users') || {}
+  const uidToName = (uid) => {
+    const u = Object.values(users).find(u => u.id === uid)
+    return u ? (u.full_name || u.username) : 'unknown'
+  }
+  const textH = localGet('text_history') || []
+  textH.forEach(h => reviews.unshift({ id: h.id + 0.1, type: 'text', user_id: h.user_id, username: uidToName(h.user_id), prompt: h.prompt, content: (h.content || '').substring(0, 500), status: 'approved', created_at: h.created_at, reviewed_at: h.created_at, review_reason: '历史数据自动通过' }))
+  const imageH = localGet('image_history') || []
+  imageH.forEach(h => reviews.unshift({ id: h.id + 0.2, type: 'image', user_id: h.user_id, username: uidToName(h.user_id), prompt: h.prompt, content: h.image_url || '', status: 'approved', created_at: h.created_at, reviewed_at: h.created_at, review_reason: '历史数据自动通过' }))
+  const audioH = localGet('audio_history') || []
+  audioH.forEach(h => reviews.unshift({ id: h.id + 0.3, type: 'audio', user_id: h.user_id, username: uidToName(h.user_id), prompt: h.text || '', content: '', status: 'approved', created_at: h.created_at, reviewed_at: h.created_at, review_reason: '历史数据自动通过' }))
+  const videoH = localGet('video_history') || []
+  videoH.forEach(h => reviews.unshift({ id: h.id + 0.4, type: 'video', user_id: h.user_id, username: uidToName(h.user_id), prompt: h.prompt || '', content: '', status: 'approved', created_at: h.created_at, reviewed_at: h.created_at, review_reason: '历史数据自动通过' }))
+  localSet('content_reviews', reviews.slice(0, 500))
+  localSet('content_review_migrated', true)
+}
 
 const API = {
   getToken() { return localStorage.getItem('token') },
   setToken(token) { localStorage.setItem('token', token) },
   removeToken() { localStorage.removeItem('token') },
+
+  _addContentReview(type, user, prompt, content) {
+    const reviews = localGet('content_reviews') || []
+    reviews.unshift({
+      id: Date.now() + Math.random(),
+      type,
+      user_id: user?.id || null,
+      username: user?.username || 'unknown',
+      prompt,
+      content,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+      reviewed_at: null,
+      review_reason: ''
+    })
+    localSet('content_reviews', reviews.slice(0, 500))
+  },
+
   getCurrentUser() {
     const token = this.getToken(); if (!token) return null
     try { const data = JSON.parse(atob(token.split('.')[1])); const users = localGet('users') || {}; return users[data.sub] || null } catch { return null }
@@ -116,6 +155,7 @@ const API = {
       const history = localGet('text_history') || []
       history.unshift({ id: Date.now(), prompt: body.prompt, content: result, created_at: new Date().toISOString(), user_id: user?.id })
       localSet('text_history', history.slice(0, 100))
+      this._addContentReview('text', user, body.prompt, result.substring(0, 500))
       return { content: result, generated_at: new Date().toISOString() }
     }
     if (path === 'api/image/generate' && method === 'POST') {
@@ -123,6 +163,7 @@ const API = {
       const history = localGet('image_history') || []
       history.unshift({ id: Date.now(), prompt: body.prompt, image_url: result, created_at: new Date().toISOString(), user_id: user?.id })
       localSet('image_history', history.slice(0, 100))
+      this._addContentReview('image', user, body.prompt, result)
       return { image_url: result, generated_at: new Date().toISOString() }
     }
     if (path === 'api/audio/generate' && method === 'POST') {
@@ -242,9 +283,48 @@ const API = {
       if (method === 'PUT') { localSet('system_config', { ...localGet('system_config'), ...body }); return localGet('system_config') }
     }
     if (path === 'api/admin/logs') { return (localGet('admin_logs') || []).reverse().slice(0, 50) }
+    if (path === 'api/admin/contents/pending') {
+      let reviews = localGet('content_reviews') || []
+      const statusFilter = new URLSearchParams(url.split('?')[1] || '').get('status')
+      if (statusFilter) reviews = reviews.filter(r => r.status === statusFilter)
+      const users = localGet('users') || {}
+      reviews.forEach(r => {
+        if (r.user_id && !r.username) {
+          const u = Object.values(users).find(u => u.id === r.user_id)
+          if (u) r.username = u.full_name || u.username
+        }
+      })
+      return reviews.slice(0, 100)
+    }
+    if (path.match(/^api\/admin\/contents\/[\d.]+\/review$/)) {
+      const id = parseFloat(path.split('/')[3])
+      const reviews = localGet('content_reviews') || []
+      const idx = reviews.findIndex(r => r.id === id)
+      if (idx >= 0) {
+        reviews[idx].status = body.approved ? 'approved' : 'rejected'
+        reviews[idx].reviewed_at = new Date().toISOString()
+        reviews[idx].review_reason = body.reason || ''
+        localSet('content_reviews', reviews)
+        const logs = localGet('admin_logs') || []
+        logs.push({ id: Date.now(), user_id: user?.id, action: 'review_content', details: `${body.approved ? '通过' : '拒绝'}内容审核 #${Math.floor(id)}`, created_at: new Date().toISOString() })
+        localSet('admin_logs', logs.slice(-200))
+        return { message: body.approved ? '内容已通过审核' : '内容已拒绝' }
+      }
+      throw new Error('内容不存在')
+    }
+    if (path === 'api/admin/contents/stats') {
+      const reviews = localGet('content_reviews') || []
+      return {
+        total: reviews.length,
+        pending: reviews.filter(r => r.status === 'pending').length,
+        approved: reviews.filter(r => r.status === 'approved').length,
+        rejected: reviews.filter(r => r.status === 'rejected').length
+      }
+    }
     if (path === 'api/admin/statistics') {
       const users = localGet('users') || {}
-      return { total_users: Object.values(users).length, total_creations: (localGet('text_history') || []).length + (localGet('image_history') || []).length + (localGet('audio_history') || []).length + (localGet('video_history') || []).length, total_contents: 0, pending_reviews: 0, total_tasks: (localGet('tasks') || []).length, total_submissions: (localGet('submissions') || []).length }
+      const reviews = localGet('content_reviews') || []
+      return { total_users: Object.values(users).length, total_creations: (localGet('text_history') || []).length + (localGet('image_history') || []).length + (localGet('audio_history') || []).length + (localGet('video_history') || []).length, total_contents: reviews.length, pending_reviews: reviews.filter(r => r.status === 'pending').length, total_tasks: (localGet('tasks') || []).length, total_submissions: (localGet('submissions') || []).length }
     }
     if (path === 'api/statistics/export-report') {
       return { report_url: '#', message: '报告导出功能暂由前端直接生成' }
