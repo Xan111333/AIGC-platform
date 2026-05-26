@@ -161,7 +161,7 @@
             </div>
             <div class="stats-grid">
               <div class="stat-card">
-                <div class="stat-circle" style="--progress: 75%">
+                <div class="stat-circle" :style="{ '--progress': stats.totalProgress + '%' }">
                   <svg viewBox="0 0 36 36">
                     <path d="M18 2.0845
                       a 15.9155 15.9155 0 0 1 0 31.831
@@ -172,21 +172,21 @@
                       a 15.9155 15.9155 0 0 1 0 31.831
                       a 15.9155 15.9155 0 0 1 0 -31.831"
                       class="circle-progress"
-                      stroke-dasharray="75, 100"
+                      :stroke-dasharray="`${stats.totalProgress}, 100`"
                     />
                   </svg>
-                  <span class="circle-text">75%</span>
+                  <span class="circle-text">{{ stats.totalProgress }}%</span>
                 </div>
                 <span class="stat-name">总体进度</span>
               </div>
-              
+
               <div class="stat-card">
-                <div class="stat-number primary">12</div>
+                <div class="stat-number primary">{{ stats.completed }}</div>
                 <span class="stat-name">已完成任务</span>
               </div>
-              
+
               <div class="stat-card">
-                <div class="stat-number warning">3</div>
+                <div class="stat-number warning">{{ stats.pending }}</div>
                 <span class="stat-name">待完成任务</span>
               </div>
             </div>
@@ -281,25 +281,100 @@
 </template>
 
 <script setup>
-import { ref, h } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, h, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import API from '../api'
 import AppLayout from '../components/AppLayout.vue'
 
-const pendingTasks = ref([
-  { id: 1, title: '文本生成基础练习', type: '文本生成', deadline: '2024-01-20', status: 'pending' },
-  { id: 2, title: '创意图像设计', type: '图像生成', deadline: '2024-01-22', status: 'pending' },
-  { id: 3, title: '视频剪辑实训', type: '视频生成', deadline: '2024-01-25', status: 'pending' }
-])
+const router = useRouter()
 
-const recentWorks = ref([
-  { id: 1, title: '科技文章', type: 'text', date: '2024-01-15', gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)' },
-  { id: 2, title: '风景插画', type: 'image', date: '2024-01-14', gradient: 'linear-gradient(135deg, #f472b6, #fb7185)' },
-  { id: 3, title: '产品介绍', type: 'text', date: '2024-01-13', gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)' },
-  { id: 4, title: '人物肖像', type: 'image', date: '2024-01-12', gradient: 'linear-gradient(135deg, #60a5fa, #06b6d4)' },
-  { id: 5, title: '音频旁白', type: 'audio', date: '2024-01-11', gradient: 'linear-gradient(135deg, #34d399, #10b981)' }
-])
+const pendingTasks = ref([])
+const completedCount = ref(0)
+const recentWorks = ref([])
 
 const todayTip = ref('使用更具体的提示词可以获得更好的生成效果。尝试添加细节描述，如颜色、风格、场景等，AI 会更准确地理解您的需求。')
+
+const stats = computed(() => {
+  const total = pendingTasks.value.length + completedCount.value
+  return {
+    totalProgress: total > 0 ? Math.round((completedCount.value / total) * 100) : 0,
+    completed: completedCount.value,
+    pending: pendingTasks.value.length
+  }
+})
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
+const getTaskTypeLabel = (type) => {
+  const map = {
+    text: '文本生成',
+    image: '图像生成',
+    audio: '音频生成',
+    video: '视频生成',
+    document: '文档',
+    tutorial: '教程',
+    case: '案例'
+  }
+  return map[type] || type || '综合任务'
+}
+
+const loadTasks = async () => {
+  try {
+    const tasks = await API.getTasks()
+    const mySubmissions = await API.getMySubmissions()
+    const submittedTaskIds = new Set(mySubmissions.map(s => s.task_id))
+
+    completedCount.value = tasks.filter(t => submittedTaskIds.has(t.id)).length
+
+    const pending = tasks.filter(t => !submittedTaskIds.has(t.id))
+
+    if (pending.length > 0) {
+      pendingTasks.value = pending.slice(0, 5).map(t => ({
+        id: t.id,
+        title: t.title,
+        type: getTaskTypeLabel(t.type || t.module_type),
+        deadline: formatDate(t.deadline || t.created_at),
+        status: 'pending'
+      }))
+    } else {
+      pendingTasks.value = []
+    }
+  } catch (error) {
+    console.error('Load tasks error:', error)
+  }
+}
+
+const loadRecentWorks = async () => {
+  try {
+    const [textHistory, imageHistory, audioHistory, videoHistory] = await Promise.all([
+      API.getTextHistory(),
+      API.getImageHistory(),
+      API.getAudioHistory(),
+      API.getVideoHistory()
+    ])
+
+    const allWorks = [
+      ...textHistory.map(h => ({ id: 't-' + h.id, title: (h.prompt || '文本生成').slice(0, 20), type: 'text', date: formatDate(h.created_at), gradient: 'linear-gradient(135deg, #6366f1, #8b5cf6)' })),
+      ...imageHistory.map(h => ({ id: 'i-' + h.id, title: (h.prompt || '图像生成').slice(0, 20), type: 'image', date: formatDate(h.created_at), gradient: 'linear-gradient(135deg, #f472b6, #fb7185)' })),
+      ...audioHistory.map(h => ({ id: 'a-' + h.id, title: (h.text || '音频生成').slice(0, 20), type: 'audio', date: formatDate(h.created_at), gradient: 'linear-gradient(135deg, #34d399, #10b981)' })),
+      ...videoHistory.map(h => ({ id: 'v-' + h.id, title: (h.prompt || '视频生成').slice(0, 20), type: 'video', date: formatDate(h.created_at), gradient: 'linear-gradient(135deg, #60a5fa, #06b6d4)' }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5)
+
+    if (allWorks.length > 0) {
+      recentWorks.value = allWorks
+    }
+  } catch (error) {
+    console.error('Load recent works error:', error)
+  }
+}
 
 const getWorkIcon = (type) => {
   const icons = {
@@ -335,8 +410,13 @@ const getTypeLabel = (type) => {
 }
 
 const goToTask = (taskId) => {
-  ElMessage.info('跳转到任务页面')
+  router.push('/student-tasks')
 }
+
+onMounted(() => {
+  loadTasks()
+  loadRecentWorks()
+})
 </script>
 
 <style scoped>

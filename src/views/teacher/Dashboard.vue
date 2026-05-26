@@ -113,7 +113,7 @@
         </div>
       </div>
       
-      <el-dialog title="批改作业" :visible.sync="gradeDialogVisible" width="500px">
+      <el-dialog title="批改作业" v-model="gradeDialogVisible" width="500px">
         <el-form :model="gradeForm" label-width="80px">
           <el-form-item label="学生">
             <el-input v-model="gradeForm.studentName" disabled />
