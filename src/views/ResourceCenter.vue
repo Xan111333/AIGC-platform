@@ -278,7 +278,8 @@ const handleCategoryChange = () => {
 
 const showResourceDetail = async (resource) => {
   try {
-    selectedResource.value = await API.getResource(resource.id)
+    const result = await API.getResource(resource.id)
+    selectedResource.value = result || resource
   } catch (error) {
     selectedResource.value = resource
   }
