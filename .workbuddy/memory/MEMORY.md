@@ -8,6 +8,7 @@
 - **Vite base**: `/AIGC-platform/`（适配 GitHub Pages 路径）
 - **Vue Router**: 使用 `createWebHistory('/AIGC-platform/')`
 - **gh-pages 分支**: 用于 GitHub Pages 部署，包含 dist 静态文件
+- **部署方式**: 禁用 `git subtree split`（会丢失文件），改用临时目录独立部署（cp dist → 独立 git init → force push gh-pages）
 - **Token 限制**: 当前 PAT 无 `pages` 和 `workflow` scope，无法通过 API 启用 Pages 或推送 workflow 文件
 
 ## 技术栈

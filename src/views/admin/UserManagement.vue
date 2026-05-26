@@ -194,19 +194,25 @@ const loadUsers = async () => {
       skip: ((currentPage.value - 1) * pageSize.value).toString(),
       limit: pageSize.value.toString()
     })
-    
+
     if (filterRole.value) {
       params.append('role', filterRole.value)
     }
     if (searchKeyword.value) {
       params.append('search', searchKeyword.value)
     }
-    
+
     const data = await API.request(`/api/admin/users?${params}`)
+    // 获取全部用户数（不含分页）用于分页组件
+    const allParams = new URLSearchParams()
+    if (filterRole.value) allParams.append('role', filterRole.value)
+    if (searchKeyword.value) allParams.append('search', searchKeyword.value)
+    const allData = await API.request(`/api/admin/users?${allParams}`)
     users.value = data
-    total.value = data.length
+    total.value = allData.length
   } catch (error) {
     console.error('Load users error:', error)
+    ElMessage.error('加载用户失败: ' + (error.message || '未知错误'))
     users.value = []
   } finally {
     loading.value = false

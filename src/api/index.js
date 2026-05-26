@@ -94,7 +94,7 @@ const API = {
     await new Promise(r => setTimeout(r, 100))
     const token = this.getToken()
     const user = token ? this.getCurrentUser() : null
-    const path = url.replace(/^\//, '')
+    const path = url.replace(/^\//, '').split('?')[0]
     const body = options.body ? JSON.parse(options.body) : null
     const method = (options.method || 'GET').toUpperCase()
 
@@ -210,7 +210,17 @@ const API = {
     }
     if (path === 'api/statistics/module-usage') { return { text: (localGet('text_history') || []).length, image: (localGet('image_history') || []).length, audio: (localGet('audio_history') || []).length, video: (localGet('video_history') || []).length } }
     if (path === 'api/admin/users') {
-      if (method === 'GET') { const users = localGet('users') || {}; return Object.values(users) }
+      const params = new URLSearchParams(url.split('?')[1] || '')
+      const searchRole = params.get('role')
+      const search = (params.get('search') || '').toLowerCase()
+      const skip = parseInt(params.get('skip') || '0')
+      const limit = parseInt(params.get('limit') || '100')
+      if (method === 'GET') {
+        let users = Object.values(localGet('users') || {})
+        if (searchRole) users = users.filter(u => u.role === searchRole)
+        if (search) users = users.filter(u => (u.username || '').toLowerCase().includes(search) || (u.full_name || '').toLowerCase().includes(search))
+        return users.slice(skip, skip + limit)
+      }
       if (method === 'POST') { const users = localGet('users') || {}; let counter = localGet('user_id_counter') || 4; users[body.username] = { ...body, id: counter++, hashed_password: simpleHash(body.password || '123456'), is_active: true, created_at: new Date().toISOString() }; localSet('users', users); localSet('user_id_counter', counter); return users[body.username] }
     }
     if (path.match(/^api\/admin\/users\/\d+$/)) {
