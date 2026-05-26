@@ -50,9 +50,16 @@ function initDefaultUsers() {
   localSet('system_config', { site_name: 'AIGC 实训平台', site_description: '探索 AI 创作的无限可能', max_daily_generations: 50, allow_registration: true, require_content_review: false, api_key_status: { zhipu: true } })
 }
 initDefaultUsers()
-// 如果任务表为空，自动填充默认题目
-if (!localGet('tasks') || localGet('tasks').length === 0) {
-  localSet('tasks', getDefaultTasks())
+// 如果任务表为空或缺少默认题目，自动填充（使用版本标记防止重复）
+const TASK_SEED_VERSION = 2
+const seededVersion = localGet('task_seed_version')
+if (!seededVersion || seededVersion < TASK_SEED_VERSION) {
+  const existing = localGet('tasks') || []
+  // 移除旧版本种子任务（id 1-10），保留用户新建的任务
+  const userTasks = existing.filter(t => t.id > 10)
+  const defaultTasks = getDefaultTasks()
+  localSet('tasks', [...defaultTasks, ...userTasks])
+  localSet('task_seed_version', TASK_SEED_VERSION)
 }
 
 const API = {

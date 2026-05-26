@@ -106,7 +106,7 @@
           </div>
           
           <div class="nav-group" v-if="userRole === 'teacher'">
-            <span class="nav-label">教学管理</span>
+            <span class="nav-label">工作台</span>
             <router-link to="/teacher-dashboard" class="nav-item" :class="{ active: isActive('/teacher-dashboard') }">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="2"></rect>
@@ -114,9 +114,12 @@
                 <rect x="14" y="14" width="7" height="7" rx="2"></rect>
                 <rect x="3" y="14" width="7" height="7" rx="2"></rect>
               </svg>
-              <span>数据统计</span>
+              <span>首页仪表盘</span>
             </router-link>
-            
+          </div>
+
+          <div class="nav-group" v-if="userRole === 'teacher'">
+            <span class="nav-label">教学管理</span>
             <router-link to="/task-manager" class="nav-item" :class="{ active: isActive('/task-manager') }">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="20" x2="12" y2="10"></line>
