@@ -53,17 +53,17 @@
               <div class="param-item">
                 <label>视频时长</label>
                 <el-select v-model="params.duration" class="param-select" placeholder="选择时长">
-                  <el-option label="3秒" value="3" />
                   <el-option label="5秒" value="5" />
                   <el-option label="10秒" value="10" />
+                  <el-option label="15秒" value="15" />
                 </el-select>
               </div>
               
               <div class="param-item">
                 <label>分辨率</label>
                 <el-select v-model="params.resolution" class="param-select" placeholder="选择分辨率">
-                  <el-option label="720p" value="720p" />
-                  <el-option label="1080p" value="1080p" />
+                  <el-option label="720P" value="720P" />
+                  <el-option label="1080P" value="1080P" />
                 </el-select>
               </div>
             </div>
@@ -91,11 +91,19 @@
             </div>
             
             <div class="param-item">
-              <div class="param-header">
-                <label>创意程度</label>
-                <span class="param-value">{{ creativityLabels[params.creativity] }}</span>
+              <label>画面比例</label>
+              <div class="ratio-options">
+                <div
+                  v-for="ratio in ratioOptions"
+                  :key="ratio.value"
+                  class="ratio-option"
+                  :class="{ 'active': params.ratio === ratio.value }"
+                  @click="params.ratio = ratio.value"
+                >
+                  <div class="ratio-preview" :style="{ aspectRatio: ratio.value }"></div>
+                  <span class="ratio-label">{{ ratio.label }}</span>
+                </div>
               </div>
-              <el-slider v-model="params.creativity" :min="0" :max="10" :step="1" show-stops />
             </div>
           </div>
         </div>
@@ -273,6 +281,12 @@
                 </svg>
                 {{ getStyleLabel(params.style) }}
               </el-tag>
+              <el-tag type="info" effect="plain">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                </svg>
+                {{ params.ratio }}
+              </el-tag>
             </div>
             
             <div class="video-actions">
@@ -304,15 +318,15 @@ const generatedVideo = ref('')
 const progressPercent = ref(0)
 const loadingMessage = ref('正在初始化...')
 const currentStep = ref(0)
-const remainingTime = ref(45)
+const remainingTime = ref(120)
 
 let timer = null
 
 const params = reactive({
   duration: 5,
-  resolution: '720p',
-  style: 'realistic',
-  creativity: 5
+  resolution: '720P',
+  ratio: '16:9',
+  style: 'realistic'
 })
 
 const promptPresets = [
@@ -320,6 +334,12 @@ const promptPresets = [
   { label: '城市夜景', text: '繁华都市的夜景，霓虹灯闪烁，高楼大厦灯火通明' },
   { label: '科技未来', text: '未来科技城市，悬浮列车，全息投影，充满科幻感的场景' },
   { label: '梦幻仙境', text: '梦幻的森林仙境，萤火虫飞舞，神秘的光芒，童话般的氛围' }
+]
+
+const ratioOptions = [
+  { label: '16:9 横屏', value: '16:9' },
+  { label: '9:16 竖屏', value: '9:16' },
+  { label: '1:1 方形', value: '1:1' }
 ]
 
 const styleOptions = [
@@ -336,22 +356,20 @@ const styleLabels = {
   painting: '油画'
 }
 
-const creativityLabels = ['保守', '较低', '适中', '较高', '创意', '创意', '创意', '创意', '创意', '创意', '创意']
-
 const loadingSteps = [
-  '初始化生成',
-  '分析提示词',
-  '构建场景',
-  '渲染帧画面',
+  '提交任务',
+  '排队等待',
+  'AI生成中',
+  '渲染画面',
   '合成视频'
 ]
 
 const loadingMessages = [
-  '正在初始化视频生成...',
-  '正在分析您的提示词...',
-  '正在构建视频场景...',
+  '正在向魔塔社区提交生成任务...',
+  '任务排队中，请稍候...',
+  'AI 正在生成视频，通常需要 1-3 分钟...',
   '正在渲染每一帧画面...',
-  '正在合成最终视频...'
+  '即将完成，正在合成最终视频...'
 ]
 
 const getStyleLabel = (style) => styleLabels[style] || style
@@ -361,54 +379,75 @@ const handleGenerate = async () => {
     ElMessage.error('请输入提示词')
     return
   }
-  
+
   isGenerating.value = true
   generatedVideo.value = ''
   progressPercent.value = 0
   currentStep.value = 0
-  remainingTime.value = 45
+  remainingTime.value = 120
   loadingMessage.value = loadingMessages[0]
-  
-  timer = setInterval(() => {
-    progressPercent.value += Math.random() * 10 + 3
-    
-    if (progressPercent.value >= 100) {
-      progressPercent.value = 100
-    }
-    
-    const newStep = Math.floor(progressPercent.value / 20)
-    if (newStep < loadingSteps.length && newStep !== currentStep.value) {
-      currentStep.value = newStep
-      if (newStep < loadingMessages.length) {
-        loadingMessage.value = loadingMessages[newStep]
-      }
-    }
-    
-    remainingTime.value = Math.max(0, Math.floor((100 - progressPercent.value) / 2))
-    
-    if (progressPercent.value >= 100) {
-      clearInterval(timer)
-    }
-  }, 500)
-  
+
   try {
-    const result = await API.generateVideo(prompt.value, {
+    // Step 1: 提交异步任务到魔塔社区（DashScope Wan 模型）
+    const { taskId } = await API.submitVideoTask(prompt.value, {
       duration: params.duration,
       resolution: params.resolution,
-      style: params.style
+      style: params.style,
+      ratio: params.ratio
     })
-    
-    generatedVideo.value = result.result_url || 'https://www.w3schools.com/html/mov_bbb.mp4'
-    ElMessage.success('视频生成成功')
+
+    loadingMessage.value = '任务已提交，等待处理...'
+    progressPercent.value = 5
+    currentStep.value = 1
+
+    // Step 2: 每 10 秒轮询任务状态
+    timer = setInterval(async () => {
+      try {
+        const result = await API.queryVideoTask(taskId)
+
+        if (result.status === 'SUCCEEDED' && result.videoUrl) {
+          clearInterval(timer)
+          timer = null
+          generatedVideo.value = result.videoUrl
+          progressPercent.value = 100
+          currentStep.value = loadingSteps.length
+          remainingTime.value = 0
+          isGenerating.value = false
+          // 保存到历史记录
+          try {
+            const history = JSON.parse(localStorage.getItem('aigc_video_history') || '[]')
+            history.unshift({ id: Date.now(), prompt: prompt.value, video_url: result.videoUrl, created_at: new Date().toISOString() })
+            localStorage.setItem('aigc_video_history', JSON.stringify(history.slice(0, 100)))
+          } catch (_) {}
+          ElMessage.success('视频生成成功！')
+        } else if (result.status === 'FAILED') {
+          clearInterval(timer)
+          timer = null
+          isGenerating.value = false
+          ElMessage.error('视频生成失败: ' + (result.message || '请稍后重试'))
+        } else if (result.status === 'RUNNING') {
+          loadingMessage.value = loadingMessages[2]
+          progressPercent.value = Math.min(90, progressPercent.value + 3)
+          currentStep.value = 2
+          remainingTime.value = Math.max(0, Math.floor((100 - progressPercent.value) / 1.5))
+        } else if (result.status === 'PENDING') {
+          loadingMessage.value = loadingMessages[1]
+          progressPercent.value = Math.max(5, progressPercent.value + 0.5)
+        } else if (result.status === 'UNKNOWN') {
+          clearInterval(timer)
+          timer = null
+          isGenerating.value = false
+          ElMessage.error('任务已过期或不存在，请重新生成')
+        }
+      } catch (pollErr) {
+        console.error('轮询出错:', pollErr)
+      }
+    }, 10000)
   } catch (error) {
-    console.error('Video generation error:', error)
-    generatedVideo.value = 'https://www.w3schools.com/html/mov_bbb.mp4'
-    ElMessage.success('视频生成成功')
-  } finally {
-    progressPercent.value = 100
-    currentStep.value = loadingSteps.length
+    console.error('提交任务失败:', error)
     isGenerating.value = false
-    if (timer) clearInterval(timer)
+    if (timer) { clearInterval(timer); timer = null }
+    ElMessage.error('提交失败: ' + (error.message || '请检查网络后重试'))
   }
 }
 
@@ -659,6 +698,58 @@ onUnmounted(() => {
 }
 
 .style-option.active .style-label {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.ratio-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ratio-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ratio-option:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  background: rgba(6, 182, 212, 0.1);
+}
+
+.ratio-option.active {
+  border-color: #06b6d4;
+  background: rgba(6, 182, 212, 0.2);
+}
+
+.ratio-preview {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #64748b 0%, #334155 100%);
+  border-radius: 6px;
+  transition: all var(--transition-fast);
+}
+
+.ratio-option.active .ratio-preview {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  box-shadow: 0 2px 12px rgba(6, 182, 212, 0.4);
+}
+
+.ratio-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.ratio-option.active .ratio-label {
   color: var(--color-text-primary);
   font-weight: 500;
 }
