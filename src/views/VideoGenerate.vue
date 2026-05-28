@@ -52,7 +52,7 @@
             <div class="param-row">
               <div class="param-item">
                 <label>视频时长</label>
-                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">固定 5 秒（免费版限制）</el-tag>
+                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">固定 5 秒</el-tag>
               </div>
               <div class="param-item">
                 <label>分辨率</label>
@@ -320,7 +320,7 @@ const params = reactive({
   ratio: '16:9',
   style: 'realistic'
 })
-// 注意：当前使用 wan2.1-t2v-turbo 模型，固定 5 秒 / 720P，仅比例可调
+// 注意：当前使用 wan2.2-t2v-plus 模型，固定 5 秒 / 720P，仅比例可调
 
 const promptPresets = [
   { label: '自然风光', text: '壮观的日落景象，金色阳光洒在连绵的山脉上，水面波光粼粼' },

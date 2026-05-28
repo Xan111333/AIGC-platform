@@ -2,9 +2,8 @@ import { jsPDF } from 'jspdf'
 import { Document, Packer, Paragraph } from 'docx'
 import JSZip from 'jszip'
 
-// 后端 API 地址（Railway 部署）
-const BASE_URL = 'https://aigc-platform-production.up.railway.app'
 const ZHIPU_API_KEY = 'd1354054dcb045c19df3dcd50c2f4827.C0osK2v5qXYiEOI1'
+const DASHSCOPE_API_KEY = 'sk-f32611a38b47427cb06458ceac30ae39'
 
 function localGet(key) {
   try { return JSON.parse(localStorage.getItem('aigc_' + key) || 'null') } catch { return null }
@@ -373,39 +372,47 @@ const API = {
     return data.data?.[0]?.url || ''
   },
 
-  // === DashScope 视频生成（通过后端代理，避免 CORS 问题） ===
-  async submitVideoTask(promptText, params = {}) {
-    const body = {
-      prompt: promptText,
-      style: params.style || 'realistic',
-      ratio: params.ratio || '16:9'
+  // === DashScope 视频生成（阿里云通义 Wan 模型，通过 CORS 代理） ===
+  async _dashscopeFetch(url, options = {}) {
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url)
+    const headers = { 'Authorization': `Bearer ${DASHSCOPE_API_KEY}` }
+    if (options.method && options.method !== 'GET') {
+      headers['Content-Type'] = 'application/json'
     }
-    const token = this.getToken()
-    const res = await fetch(`${BASE_URL}/api/video/submit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify(body)
-    })
+    Object.assign(headers, options.headers || {})
+
+    const res = await fetch(proxyUrl, { ...options, headers })
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      throw new Error(err.detail || `视频生成请求失败 (${res.status})`)
+      throw new Error(err.output?.message || err.message || `DashScope 请求失败 (${res.status})`)
     }
-    const data = await res.json()
-    if (data.task_id) return { taskId: data.task_id }
-    throw new Error(data.message || data.detail || '提交视频生成任务失败')
+    return res.json()
+  },
+
+  async submitVideoTask(promptText, params = {}) {
+    const styleMap = { 'realistic': '写实风格，真实感强，', 'cartoon': '卡通动画风格，色彩鲜艳，', 'sci-fi': '科幻风格，未来感，', 'painting': '油画风格，艺术感，' }
+    const enhancedPrompt = (styleMap[params.style] || '') + promptText
+
+    const body = {
+      model: 'wan2.2-t2v-plus',
+      input: { prompt: enhancedPrompt },
+      parameters: {
+        size: params.ratio === '9:16' ? '720*1280' : params.ratio === '1:1' ? '960*960' : '1280*720'
+      }
+    }
+
+    const data = await this._dashscopeFetch(
+      'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis',
+      { method: 'POST', headers: { 'X-DashScope-Async': 'enable' }, body: JSON.stringify(body) }
+    )
+    const taskId = data.output?.task_id
+    if (taskId) return { taskId }
+    throw new Error(data.message || data.output?.message || '提交视频生成任务失败')
   },
 
   async queryVideoTask(taskId) {
-    const token = this.getToken()
-    const res = await fetch(`${BASE_URL}/api/video/task/${taskId}`, {
-      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
-    })
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}))
-      throw new Error(err.detail || `查询任务失败 (${res.status})`)
-    }
-    const data = await res.json()
-    return { status: data.status || 'UNKNOWN', videoUrl: data.video_url || '', message: data.message || '' }
+    const data = await this._dashscopeFetch(`https://dashscope.aliyuncs.com/api/v1/tasks/${taskId}`, { method: 'GET' })
+    return { status: data.output?.task_status || 'UNKNOWN', videoUrl: data.output?.video_url || '', message: data.output?.message || '' }
   },
 
   async exportTextToPdf(text, title = 'Generated Content') {
