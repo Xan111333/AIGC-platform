@@ -56,7 +56,7 @@
               </div>
               <div class="param-item">
                 <label>分辨率</label>
-                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">720P（最省成本）</el-tag>
+                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">1080P</el-tag>
               </div>
             </div>
 
@@ -316,7 +316,7 @@ let timer = null
 
 const params = reactive({
   duration: 5,
-  resolution: '720P',
+  resolution: '1080P',
   ratio: '16:9',
   style: 'realistic'
 })

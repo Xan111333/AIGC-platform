@@ -397,7 +397,7 @@ const API = {
       model: 'wan2.2-t2v-plus',
       input: { prompt: enhancedPrompt },
       parameters: {
-        size: params.ratio === '9:16' ? '720*1280' : params.ratio === '1:1' ? '960*960' : '1280*720'
+        size: params.ratio === '9:16' ? '1080*1920' : params.ratio === '1:1' ? '1248*1248' : '1920*1080'
       }
     }
 
