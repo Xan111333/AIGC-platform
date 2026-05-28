@@ -7,6 +7,7 @@ from app.routes.text import router as text_router
 from app.routes.image import router as image_router
 from app.routes.audio import router as audio_router
 from app.routes.tasks import router as tasks_router
+from app.routes.video import router as video_router
 from app.database import init_db, SessionLocal
 from app.utils.local_storage import init_storage
 from app.seed_tasks import seed_tasks
@@ -32,6 +33,7 @@ app.include_router(text_router)
 app.include_router(image_router)
 app.include_router(audio_router)
 app.include_router(tasks_router)
+app.include_router(video_router)
 
 @app.get("/")
 def read_root():

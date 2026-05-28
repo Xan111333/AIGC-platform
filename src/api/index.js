@@ -2,8 +2,9 @@ import { jsPDF } from 'jspdf'
 import { Document, Packer, Paragraph } from 'docx'
 import JSZip from 'jszip'
 
+// 后端 API 地址（Railway 部署）
+const BASE_URL = 'https://aigc-platform-production.up.railway.app'
 const ZHIPU_API_KEY = 'd1354054dcb045c19df3dcd50c2f4827.C0osK2v5qXYiEOI1'
-const DASHSCOPE_API_KEY = 'sk-f32611a38b47427cb06458ceac30ae39'
 
 function localGet(key) {
   try { return JSON.parse(localStorage.getItem('aigc_' + key) || 'null') } catch { return null }
@@ -372,64 +373,39 @@ const API = {
     return data.data?.[0]?.url || ''
   },
 
-  // === DashScope 视频生成（魔塔社区 Wan 模型） ===
-  async _dashscopeFetch(url, options = {}) {
-    // 尝试多个 CORS 代理，提升可用性
-    const proxies = [
-      'https://corsproxy.io/?',
-      'https://api.allorigins.win/raw?url=',
-      'https://api.codetabs.com/v1/proxy?quest='
-    ]
-    const headers = { 'Authorization': `Bearer ${DASHSCOPE_API_KEY}` }
-    if (options.method && options.method !== 'GET') {
-      headers['Content-Type'] = 'application/json'
-    }
-    Object.assign(headers, options.headers || {})
-
-    let lastError = null
-    for (const proxy of proxies) {
-      try {
-        const proxyUrl = proxy + encodeURIComponent(url)
-        const res = await fetch(proxyUrl, { ...options, headers })
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}))
-          throw new Error(err.output?.message || err.message || `DashScope 请求失败 (${res.status})`)
-        }
-        return res.json()
-      } catch (e) {
-        lastError = e
-        // 继续尝试下一个代理
-      }
-    }
-    throw lastError || new Error('所有 CORS 代理均不可用，请检查网络')
-  },
-
+  // === DashScope 视频生成（通过后端代理，避免 CORS 问题） ===
   async submitVideoTask(promptText, params = {}) {
-    const styleMap = { 'realistic': '写实风格，真实感强，', 'cartoon': '卡通动画风格，色彩鲜艳，', 'sci-fi': '科幻风格，未来感，', 'painting': '油画风格，艺术感，' }
-    const enhancedPrompt = (styleMap[params.style] || '') + promptText
-
-    // wan2.1-t2v-turbo 是最便宜的模型，固定 5 秒、720P
-    const model = 'wan2.1-t2v-turbo'
     const body = {
-      model,
-      input: { prompt: enhancedPrompt },
-      parameters: {
-        size: params.ratio === '9:16' ? '720*1280' : params.ratio === '1:1' ? '960*960' : '1280*720'
-      }
+      prompt: promptText,
+      style: params.style || 'realistic',
+      ratio: params.ratio || '16:9'
     }
-
-    const data = await this._dashscopeFetch(
-      'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis',
-      { method: 'POST', headers: { 'X-DashScope-Async': 'enable' }, body: JSON.stringify(body) }
-    )
-    const taskId = data.output?.task_id
-    if (taskId) return { taskId }
-    throw new Error(data.message || data.output?.message || '提交视频生成任务失败')
+    const token = this.getToken()
+    const res = await fetch(`${BASE_URL}/api/video/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify(body)
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.detail || `视频生成请求失败 (${res.status})`)
+    }
+    const data = await res.json()
+    if (data.task_id) return { taskId: data.task_id }
+    throw new Error(data.message || data.detail || '提交视频生成任务失败')
   },
 
   async queryVideoTask(taskId) {
-    const data = await this._dashscopeFetch(`https://dashscope.aliyuncs.com/api/v1/tasks/${taskId}`, { method: 'GET' })
-    return { status: data.output?.task_status || 'UNKNOWN', videoUrl: data.output?.video_url || '', message: data.output?.message || '' }
+    const token = this.getToken()
+    const res = await fetch(`${BASE_URL}/api/video/task/${taskId}`, {
+      headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.detail || `查询任务失败 (${res.status})`)
+    }
+    const data = await res.json()
+    return { status: data.status || 'UNKNOWN', videoUrl: data.video_url || '', message: data.message || '' }
   },
 
   async exportTextToPdf(text, title = 'Generated Content') {
