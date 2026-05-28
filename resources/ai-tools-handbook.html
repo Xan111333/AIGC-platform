@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>AIGC常用工具速查手册</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #1a1a2e; line-height: 1.7; padding: 20px; }
+  .container { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  h1 { text-align: center; color: #ea580c; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
+  h2 { color: #ea580c; font-size: 20px; margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #fff7ed; }
+  h3 { color: #374151; font-size: 16px; margin: 18px 0 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th, td { border: 1px solid #e5e7eb; padding: 10px 14px; text-align: left; font-size: 14px; }
+  th { background: #f9fafb; font-weight: 600; color: #374151; }
+  .tip-box { background: #fff7ed; border-left: 4px solid #f97316; padding: 14px 18px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .tool-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 10px 0; }
+  .tool-name { font-weight: 700; font-size: 15px; color: #ea580c; }
+  .tool-url { color: #6366f1; font-size: 12px; word-break: break-all; }
+  .tool-desc { color: #4b5563; font-size: 13px; margin: 6px 0; }
+  .tool-features { font-size: 12px; color: #6b7280; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
+  .tag-free { background: #dcfce7; color: #166534; }
+  .tag-paid { background: #fee2e2; color: #991b1b; }
+  .tag-freemium { background: #dbeafe; color: #1e40af; }
+  .tag-open { background: #fef3c7; color: #92400e; }
+  .footer { text-align: center; color: #9ca3af; margin-top: 30px; font-size: 13px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AIGC 常用工具速查手册</h1>
+  <p class="subtitle">AIGC Training Platform | 文本、图像、音频、视频 AI 工具一站式速查</p>
+
+  <h2>1. AI 文本生成工具</h2>
+
+  <div class="tool-card">
+    <div class="tool-name">ChatGPT (OpenAI) <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">全球最流行的 AI 对话工具，支持文本生成、代码编写、数据分析、图像理解等功能。</div>
+    <div class="tool-features">版本: GPT-4o / GPT-4o-mini | 特点: 多模态、插件生态丰富、最强通用能力</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">智谱清言 (GLM) <span class="tag tag-free">免费</span></div>
+    <div class="tool-desc">智谱AI推出的对话助手，中文理解能力强，集成文本、图像、视频等多种生成能力。</div>
+    <div class="tool-features">版本: GLM-4 / CogView-4 | 特点: 中文优化、多模态、国内访问稳定</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">Kimi (月之暗面) <span class="tag tag-free">免费</span></div>
+    <div class="tool-desc">支持超长文本处理的 AI 助手，擅长文档总结、论文阅读、长内容分析。</div>
+    <div class="tool-features">版本: Moonshot | 特点: 超长上下文（200万字）、文档处理能力强</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">文心一言 (百度) <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">百度推出的 AI 对话工具，集成搜索增强、多模态创作能力。</div>
+    <div class="tool-features">版本: 文心大模型 4.0 | 特点: 中文搜索增强、百度生态集成</div>
+  </div>
+
+  <h2>2. AI 图像生成工具</h2>
+
+  <div class="tool-card">
+    <div class="tool-name">Midjourney <span class="tag tag-paid">付费</span></div>
+    <div class="tool-desc">艺术风格最强的 AI 绘画工具，通过 Discord 使用，社区活跃。</div>
+    <div class="tool-features">特点: 艺术感强、风格多变、社区灵感丰富 | 使用方式: Discord Bot</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">Stable Diffusion <span class="tag tag-open">开源</span></div>
+    <div class="tool-desc">最流行的开源 AI 绘画工具，可本地部署，插件生态极其丰富。</div>
+    <div class="tool-features">特点: 完全免费、本地运行、高度可定制、ControlNet、LoRA | 平台: WebUI/ComfyUI</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">DALL-E 3 (OpenAI) <span class="tag tag-paid">付费</span></div>
+    <div class="tool-desc">OpenAI 的图像生成模型，对自然语言提示词理解力最强。</div>
+    <div class="tool-features">特点: 提示词理解精确、文字渲染能力好 | 集成: ChatGPT Plus</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">CogView-4 (智谱AI) <span class="tag tag-free">免费</span></div>
+    <div class="tool-desc">智谱AI的图像生成模型，中文场景理解优秀，支持多种比例。</div>
+    <div class="tool-features">特点: 中文优化、多种比例、国内访问快 | 集成: 智谱清言</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">Leonardo.ai <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">面向游戏和设计领域的 AI 图像生成平台，提供精细的风格控制。</div>
+    <div class="tool-features">特点: 游戏资产生成、精细控制、模型训练 | 适用: 游戏开发、概念设计</div>
+  </div>
+
+  <h2>3. AI 视频生成工具</h2>
+
+  <div class="tool-card">
+    <div class="tool-name">Sora (OpenAI) <span class="tag tag-paid">付费</span></div>
+    <div class="tool-desc">OpenAI 的文本转视频模型，能生成高质量的长视频内容。</div>
+    <div class="tool-features">特点: 物理模拟准确、视频连贯性强、最长60秒</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">Runway Gen-3 <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">专业的 AI 视频编辑和生成平台，支持文本转视频和图像转视频。</div>
+    <div class="tool-features">特点: 专业视频编辑、多种AI工具、多模态输入</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">可灵 AI (快手) <span class="tag tag-free">免费</span></div>
+    <div class="tool-desc">快手推出的 AI 视频生成工具，支持高质量文生视频和图生视频。</div>
+    <div class="tool-features">特点: 国内可用、视频质量高、支持多种风格</div>
+  </div>
+
+  <h2>4. AI 音频工具</h2>
+
+  <div class="tool-card">
+    <div class="tool-name">ElevenLabs <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">领先的 AI 语音合成和克隆平台，支持多语言。</div>
+    <div class="tool-features">特点: 语音克隆、多语言、情感表达丰富</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">Suno AI <span class="tag tag-freemium">免费+付费</span></div>
+    <div class="tool-desc">AI 音乐创作平台，输入文字描述即可生成完整歌曲。</div>
+    <div class="tool-features">特点: 全自动作曲、人声合成、多风格音乐</div>
+  </div>
+
+  <div class="tool-card">
+    <div class="tool-name">剪映 (字节跳动) <span class="tag tag-free">免费</span></div>
+    <div class="tool-desc">集成 AI 功能的视频编辑工具，支持 AI 配音、字幕生成等。</div>
+    <div class="tool-features">特点: 中文优化、操作简单、AI字幕、AI配音</div>
+  </div>
+
+  <h2>5. AI 效率工具</h2>
+
+  <table>
+    <tr><th>工具</th><th>类型</th><th>功能</th><th>价格</th></tr>
+    <tr><td>Notion AI</td><td>笔记/协作</td><td>AI辅助写作、总结、翻译</td><td><span class="tag tag-paid">付费</span></td></tr>
+    <tr><td>Gamma</td><td>PPT生成</td><td>AI生成演示文稿</td><td><span class="tag tag-freemium">免费+</span></td></tr>
+    <tr><td>Perplexity</td><td>AI搜索</td><td>带引用的AI搜索引擎</td><td><span class="tag tag-free">免费</span></td></tr>
+    <tr><td>Copilot (GitHub)</td><td>代码助手</td><td>AI代码补全和生成</td><td><span class="tag tag-freemium">免费+</span></td></tr>
+    <tr><td>ChatPDF</td><td>文档分析</td><td>与PDF文档对话</td><td><span class="tag tag-freemium">免费+</span></td></tr>
+    <tr><td>Tome</td><td>演示文稿</td><td>AI生成故事型PPT</td><td><span class="tag tag-freemium">免费+</span></td></tr>
+  </table>
+
+  <div class="tip-box">
+    <strong>选择建议：</strong>
+    <ul style="margin-top: 6px;">
+      <li><strong>预算有限：</strong>优先使用免费工具（智谱清言、Kimi、CogView-4）</li>
+      <li><strong>追求质量：</strong>ChatGPT Plus + Midjourney + Runway 组合</li>
+      <li><strong>本地部署：</strong>Stable Diffusion + Ollama（本地大模型）</li>
+      <li><strong>学习目的：</strong>先精一两种工具，再横向扩展</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    AIGC实训平台 | AIGC Training Platform | 2026<br>
+    <small>注：工具信息可能随时间变化，请以官网最新信息为准。</small>
+  </div>
+</div>
+</body>
+</html>
