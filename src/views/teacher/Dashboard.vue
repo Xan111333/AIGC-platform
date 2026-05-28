@@ -1,19 +1,40 @@
 <template>
-  <AppLayout pageTitle="数据统计" pageSubtitle="教师工作台 - 查看学生学习数据">
+  <AppLayout pageTitle="首页仪表盘" pageSubtitle="教师工作台 · 管理教学事务">
     <div class="teacher-dashboard">
-      <div class="header-actions">
-        <el-select v-model="timePeriod" @change="handlePeriodChange" style="width: 150px;">
-          <el-option label="本周" value="week" />
-          <el-option label="本月" value="month" />
-          <el-option label="本学期" value="all" />
-        </el-select>
-        <el-button icon="Download" type="primary" @click="handleExportReport">导出报表</el-button>
-      </div>
-      
-      <div class="content-wrapper">
-        <div class="stats-row">
-          <div class="stat-card glass-card">
-            <div class="stat-icon students-icon">
+      <!-- Hero 欢迎区 -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>AI 驱动的教学管理平台</span>
+          </div>
+          <h1 class="hero-title">
+            <span class="gradient-text">洞察学情，</span>
+            <span class="gradient-text">赋能教学</span>
+          </h1>
+          <p class="hero-desc">
+            一站式教学管理仪表盘，实时追踪学生学习进度、任务完成情况与作品质量，让教学决策有据可依。
+          </p>
+          <div class="hero-stats">
+            <div class="stat-item">
+              <span class="stat-number">{{ overview.total_students }}</span>
+              <span class="stat-label">学生人数</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-number">{{ overview.total_tasks }}</span>
+              <span class="stat-label">发布任务</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-number">{{ overview.submission_rate }}%</span>
+              <span class="stat-label">提交率</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="floating-card card-1 glass-card glow-border">
+            <div class="card-icon students">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                 <circle cx="9" cy="7" r="4"></circle>
@@ -21,119 +42,282 @@
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
               </svg>
             </div>
-            <div class="stat-info">
-              <div class="stat-value">{{ overview.total_students }}</div>
-              <div class="stat-label">学生总数</div>
-            </div>
+            <span>学生管理</span>
           </div>
-          
-          <div class="stat-card glass-card">
-            <div class="stat-icon tasks-icon">
+          <div class="floating-card card-2 glass-card glow-border">
+            <div class="card-icon tasks">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
             </div>
-            <div class="stat-info">
-              <div class="stat-value">{{ overview.total_tasks }}</div>
-              <div class="stat-label">任务总数</div>
-            </div>
+            <span>任务发布</span>
           </div>
-          
-          <div class="stat-card glass-card">
-            <div class="stat-icon submission-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-              </svg>
-            </div>
-            <div class="stat-info">
-              <div class="stat-value">{{ overview.submission_rate }}%</div>
-              <div class="stat-label">提交率</div>
-            </div>
-          </div>
-          
-          <div class="stat-card glass-card">
-            <div class="stat-icon score-icon">
+          <div class="floating-card card-3 glass-card glow-border">
+            <div class="card-icon grades">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
               </svg>
             </div>
-            <div class="stat-info">
-              <div class="stat-value">{{ overview.average_score }}</div>
-              <div class="stat-label">平均分</div>
+            <span>成绩分析</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 快捷操作 -->
+      <section class="quick-actions-section">
+        <div class="section-header">
+          <h2>快捷操作</h2>
+          <p>常用教学管理入口，一键直达</p>
+        </div>
+        <div class="quick-cards">
+          <router-link to="/student-tasks" class="quick-card glass-card glow-border">
+            <div class="quick-icon publish">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </div>
+            <div class="quick-info">
+              <h3>实训任务</h3>
+              <p>发布、编辑与管理学生实训任务</p>
+            </div>
+            <div class="quick-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </router-link>
+
+          <router-link to="/my-works" class="quick-card glass-card glow-border">
+            <div class="quick-icon grade">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </div>
+            <div class="quick-info">
+              <h3>作品管理</h3>
+              <p>查看、批改学生提交的各类作品</p>
+            </div>
+            <div class="quick-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </router-link>
+
+          <router-link to="/resource-center" class="quick-card glass-card glow-border">
+            <div class="quick-icon resource">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <div class="quick-info">
+              <h3>学习资源</h3>
+              <p>上传与管理教学资料与参考文档</p>
+            </div>
+            <div class="quick-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </router-link>
+
+          <div class="quick-card glass-card glow-border" @click="handleExportReport">
+            <div class="quick-icon export">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <div class="quick-info">
+              <h3>导出报表</h3>
+              <p>一键导出学生成绩与任务统计报表</p>
+            </div>
+            <div class="quick-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
             </div>
           </div>
         </div>
-        
-        <div class="charts-row">
-          <div class="chart-card glass-card">
-            <h3>成绩分布</h3>
-            <div ref="gradeChartRef" class="chart-container"></div>
+      </section>
+
+      <!-- 数据概览 -->
+      <section class="dashboard-grid">
+        <div class="grid-left">
+          <!-- 核心指标 -->
+          <div class="stats-panel glass-card">
+            <div class="panel-header">
+              <h3>核心指标</h3>
+              <el-select v-model="timePeriod" @change="handlePeriodChange" size="small" style="width: 100px;">
+                <el-option label="本周" value="week" />
+                <el-option label="本月" value="month" />
+                <el-option label="本学期" value="all" />
+              </el-select>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon-bg students">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </div>
+                <div class="stat-text">
+                  <div class="stat-number">{{ overview.total_students }}</div>
+                  <div class="stat-name">学生总数</div>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-bg tasks">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="stat-text">
+                  <div class="stat-number">{{ overview.total_tasks }}</div>
+                  <div class="stat-name">任务总数</div>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-bg submission">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                  </svg>
+                </div>
+                <div class="stat-text">
+                  <div class="stat-number">{{ overview.submission_rate }}%</div>
+                  <div class="stat-name">提交率</div>
+                </div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-icon-bg score">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <div class="stat-text">
+                  <div class="stat-number">{{ overview.average_score }}</div>
+                  <div class="stat-name">平均分</div>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div class="chart-card glass-card">
-            <h3>任务完成率</h3>
-            <div ref="taskChartRef" class="chart-container"></div>
+
+          <!-- 图表区域 -->
+          <div class="charts-row">
+            <div class="chart-card glass-card">
+              <div class="panel-header">
+                <h3>成绩分布</h3>
+              </div>
+              <div ref="gradeChartRef" class="chart-container"></div>
+            </div>
+
+            <div class="chart-card glass-card">
+              <div class="panel-header">
+                <h3>任务完成率</h3>
+              </div>
+              <div ref="taskChartRef" class="chart-container"></div>
+            </div>
           </div>
-        </div>
-        
-        <div class="charts-row">
+
           <div class="chart-card wide glass-card">
-            <h3>模块使用频次</h3>
+            <div class="panel-header">
+              <h3>模块使用频次</h3>
+            </div>
             <div ref="moduleChartRef" class="chart-container"></div>
           </div>
         </div>
-        
-        <div class="recent-section">
-          <h3>最近提交</h3>
-          <el-table :data="recentSubmissions" stripe style="width: 100%">
-            <el-table-column prop="student_name" label="学生" width="120" />
-            <el-table-column prop="task_title" label="任务" width="200" />
-            <el-table-column prop="submitted_at" label="提交时间" width="180">
-              <template #default="{ row }">
-                {{ formatDate(row.submitted_at) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="row.status === 'pending' ? 'warning' : 'success'" size="small">
-                  {{ row.status === 'pending' ? '待批改' : '已完成' }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作" fixed="right" width="120">
-              <template #default="{ row }">
-                <el-button type="primary" size="small" @click="handleGrade(row)">批改</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+
+        <div class="grid-right">
+          <!-- 最近提交 -->
+          <div class="submissions-panel glass-card">
+            <div class="panel-header">
+              <h3>最近提交</h3>
+              <router-link to="/my-works" class="view-all">查看全部</router-link>
+            </div>
+            <div class="submission-list">
+              <div v-for="row in recentSubmissions.slice(0, 6)" :key="row.id" class="submission-item">
+                <div class="submission-avatar">
+                  {{ row.student_name?.charAt(0) || '?' }}
+                </div>
+                <div class="submission-info">
+                  <h4>{{ row.student_name || '未知学生' }}</h4>
+                  <p>{{ row.task_title || '未命名任务' }}</p>
+                </div>
+                <div class="submission-meta">
+                  <el-tag :type="row.status === 'pending' ? 'warning' : 'success'" size="small">
+                    {{ row.status === 'pending' ? '待批改' : '已完成' }}
+                  </el-tag>
+                  <span class="submission-time">{{ formatDate(row.submitted_at) }}</span>
+                </div>
+              </div>
+              <div v-if="recentSubmissions.length === 0" class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <p>暂无待批改提交</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 今日提示 -->
+          <div class="tips-panel glass-card glow-border">
+            <div class="tip-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12.5A2.5 2.5 0 0 1 4.5 10h15A2.5 2.5 0 0 1 22 12.5v4.5A2.5 2.5 0 0 1 19.5 19h-15A2.5 2.5 0 0 1 2 16.5z"></path>
+                <path d="M6 10V8a6 6 0 0 1 12 0v2"></path>
+              </svg>
+            </div>
+            <div class="tip-content">
+              <h4>今日提示</h4>
+              <p>定期查看学生的作品提交情况，及时给予反馈可以有效提升学生的参与度和创作热情。</p>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <el-dialog title="批改作业" v-model="gradeDialogVisible" width="500px">
-        <el-form :model="gradeForm" label-width="80px">
-          <el-form-item label="学生">
-            <el-input v-model="gradeForm.studentName" disabled />
-          </el-form-item>
-          <el-form-item label="任务">
-            <el-input v-model="gradeForm.taskTitle" disabled />
-          </el-form-item>
-          <el-form-item label="成绩">
-            <el-input-number v-model="gradeForm.score" :min="0" :max="100" />
-          </el-form-item>
-          <el-form-item label="评语">
-            <el-input v-model="gradeForm.comment" type="textarea" :rows="4" placeholder="请输入评语" />
-          </el-form-item>
-        </el-form>
-        <div slot="footer">
-          <el-button @click="gradeDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitGrade">提交</el-button>
-        </div>
-      </el-dialog>
+      </section>
     </div>
+
+    <!-- 批改弹窗 -->
+    <el-dialog title="批改作业" v-model="gradeDialogVisible" width="500px" class="grade-dialog">
+      <el-form :model="gradeForm" label-width="80px">
+        <el-form-item label="学生">
+          <el-input v-model="gradeForm.studentName" disabled />
+        </el-form-item>
+        <el-form-item label="任务">
+          <el-input v-model="gradeForm.taskTitle" disabled />
+        </el-form-item>
+        <el-form-item label="成绩">
+          <el-input-number v-model="gradeForm.score" :min="0" :max="100" />
+        </el-form-item>
+        <el-form-item label="评语">
+          <el-input v-model="gradeForm.comment" type="textarea" :rows="4" placeholder="请输入评语" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="gradeDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitGrade">提交</el-button>
+      </template>
+    </el-dialog>
   </AppLayout>
 </template>
 
@@ -251,11 +435,10 @@ const loadModuleUsage = async () => {
 
 const initGradeChart = (data) => {
   if (!gradeChartRef.value) return
-  
   if (!gradeChart) {
     gradeChart = echarts.init(gradeChartRef.value)
   }
-  
+
   const option = {
     tooltip: { trigger: 'axis' },
     xAxis: {
@@ -277,22 +460,21 @@ const initGradeChart = (data) => {
     }],
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true }
   }
-  
+
   gradeChart.setOption(option)
 }
 
 const initTaskChart = (data) => {
   if (!taskChartRef.value) return
-  
   if (!taskChart) {
     taskChart = echarts.init(taskChartRef.value)
   }
-  
+
   const chartData = data.map(item => ({
     name: item.title,
     value: item.completion_rate
   }))
-  
+
   const option = {
     tooltip: {
       trigger: 'item',
@@ -319,24 +501,16 @@ const initTaskChart = (data) => {
       color: ['#667eea', '#764ba2', '#f093fb', '#f5576c']
     }]
   }
-  
+
   taskChart.setOption(option)
 }
 
 const initModuleChart = (data) => {
   if (!moduleChartRef.value) return
-  
   if (!moduleChart) {
     moduleChart = echarts.init(moduleChartRef.value)
   }
-  
-  const moduleNames = {
-    text: '文本生成',
-    image: '图像生成',
-    video: '视频生成',
-    audio: '音频生成'
-  }
-  
+
   const option = {
     tooltip: { trigger: 'axis' },
     xAxis: {
@@ -359,7 +533,7 @@ const initModuleChart = (data) => {
     }],
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true }
   }
-  
+
   moduleChart.setOption(option)
 }
 
@@ -403,7 +577,6 @@ const submitGrade = async () => {
       score: gradeForm.score,
       comment: gradeForm.comment
     })
-    
     ElMessage.success('批改成功')
     gradeDialogVisible.value = false
     loadOverview()
@@ -424,7 +597,6 @@ onMounted(() => {
   loadGradeDistribution()
   loadTaskCompletion()
   loadModuleUsage()
-  
   window.addEventListener('resize', handleResize)
 })
 
@@ -438,187 +610,500 @@ onUnmounted(() => {
 
 <style scoped>
 .teacher-dashboard {
-  display: flex;
-  min-height: 100vh;
-  background: #f5f7fa;
+  animation: fadeInUp 0.5s ease;
 }
 
-.sidebar {
-  width: 220px;
-  background: #1a1a2e;
-  color: white;
-  display: flex;
-  flex-direction: column;
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.logo {
+/* ===== Hero Section ===== */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-success);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-success);
+}
+
+.hero-title {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline;
+}
+
+.hero-desc {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0 0 32px;
+  max-width: 480px;
+}
+
+.hero-stats {
   display: flex;
   align-items: center;
-  padding: 20px;
-  gap: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  border-bottom: 1px solid #2d2d44;
+  gap: 24px;
 }
 
-.nav-menu {
-  flex: 1;
-  padding: 10px;
-}
-
-:deep(.el-menu) {
-  background: transparent;
-  border: none;
-}
-
-:deep(.el-menu-item), :deep(.el-sub-menu__title) {
-  color: rgba(255, 255, 255, 0.8);
-  margin: 5px 0;
-  border-radius: 8px;
-}
-
-:deep(.el-menu-item:hover), :deep(.el-sub-menu__title:hover) {
-  background: rgba(102, 126, 234, 0.3);
-}
-
-:deep(.el-menu-item.active) {
-  background: #667eea;
-}
-
-.main-content {
-  flex: 1;
+.hero-stats .stat-item {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
-.header {
+.hero-stats .stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-stats .stat-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--color-border);
+}
+
+/* Hero Visual */
+.hero-visual {
+  position: relative;
+  height: 280px;
+}
+
+.floating-card {
+  position: absolute;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 16px 24px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.header-actions {
-  display: flex;
   gap: 12px;
+  padding: 20px;
+  width: 130px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
-.content-wrapper {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
+.card-1 { top: 20px; left: 20px; animation: float1 4s ease-in-out infinite; }
+.card-2 { top: 50px; right: 40px; animation: float2 5s ease-in-out infinite; }
+.card-3 { bottom: 20px; left: 50%; transform: translateX(-50%); animation: float3 4.5s ease-in-out infinite; }
+
+@keyframes float1 {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
 }
 
-.stats-row {
+@keyframes float2 {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(-20px) rotate(-2deg); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-12px); }
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.card-icon.students { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.card-icon.tasks { background: linear-gradient(135deg, #22c55e, #10b981); }
+.card-icon.grades { background: linear-gradient(135deg, #f59e0b, #f97316); }
+
+/* ===== Quick Actions ===== */
+.quick-actions-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.section-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+}
+
+.section-header p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.quick-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-bottom: 24px;
 }
 
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
+.quick-card {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 24px;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
-.stat-icon {
-  width: 50px;
-  height: 50px;
+.quick-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.quick-icon.publish { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.quick-icon.grade { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.quick-icon.resource { background: linear-gradient(135deg, #22c55e, #10b981); }
+.quick-icon.export { background: linear-gradient(135deg, #f472b6, #fb7185); }
+
+.quick-info {
+  flex: 1;
+}
+
+.quick-info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--color-text-primary);
+}
+
+.quick-info p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.quick-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  transition: all var(--transition-normal);
+}
+
+.quick-card:hover .quick-arrow {
+  background: var(--gradient-primary);
+  color: white;
+  transform: translateX(4px);
+}
+
+/* ===== Dashboard Grid ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+}
+
+.grid-left,
+.grid-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.panel-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.view-all {
+  font-size: 13px;
+  color: var(--color-primary-light);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.view-all:hover {
+  color: var(--color-primary);
+}
+
+/* Stats Panel */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.stats-panel .stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--color-bg-glass);
+  border-radius: 14px;
+}
+
+.stat-icon-bg {
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: white;
+  flex-shrink: 0;
 }
 
-.students-icon {
-  background: #e8f4fd;
-  color: #3b82f6;
-}
+.stat-icon-bg.students { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.stat-icon-bg.tasks { background: linear-gradient(135deg, #22c55e, #10b981); }
+.stat-icon-bg.submission { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.stat-icon-bg.score { background: linear-gradient(135deg, #f472b6, #fb7185); }
 
-.tasks-icon {
-  background: #dcfce7;
-  color: #22c55e;
-}
-
-.submission-icon {
-  background: #fef3c7;
-  color: #f59e0b;
-}
-
-.score-icon {
-  background: #fce7f3;
-  color: #ec4899;
-}
-
-.stat-info {
+.stat-text {
   display: flex;
   flex-direction: column;
 }
 
-.stat-value {
-  font-size: 28px;
+.stat-text .stat-number {
+  font-size: 22px;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
-.stat-label {
-  font-size: 14px;
-  color: #999;
+.stat-text .stat-name {
+  font-size: 12px;
+  color: var(--color-text-muted);
 }
 
+/* Charts */
 .charts-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
-  margin-bottom: 24px;
 }
 
 .chart-card {
-  background: white;
-  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border-radius: 16px;
 }
 
 .chart-card.wide {
   grid-column: span 2;
 }
 
-.chart-card h3 {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
 .chart-container {
-  height: 300px;
+  height: 260px;
 }
 
-.recent-section {
-  background: white;
+/* Submissions Panel */
+.submission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.submission-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--color-bg-glass);
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all var(--transition-fast);
 }
 
-.recent-section h3 {
-  margin: 0 0 16px 0;
-  font-size: 16px;
+.submission-item:hover {
+  background: var(--color-bg-glass-hover);
+}
+
+.submission-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
   font-weight: 600;
-  color: #1a1a2e;
+  flex-shrink: 0;
+}
+
+.submission-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.submission-info h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  color: var(--color-text-primary);
+}
+
+.submission-info p {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.submission-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.submission-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  color: var(--color-text-muted);
+}
+
+.empty-state svg {
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+/* Tips Panel */
+.tips-panel {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+}
+
+.tip-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.tip-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--color-text-primary);
+}
+
+.tip-content p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+  }
+  .hero-visual {
+    display: none;
+  }
+  .quick-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+  .chart-card.wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 30px;
+  }
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .stat-divider {
+    display: none;
+  }
+  .quick-cards {
+    grid-template-columns: 1fr;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

@@ -337,7 +337,7 @@ const loadTasks = async () => {
     const pending = tasks.filter(t => !submittedTaskIds.has(t.id))
 
     if (pending.length > 0) {
-      pendingTasks.value = pending.slice(0, 5).map(t => ({
+      pendingTasks.value = pending.slice(0, 3).map(t => ({
         id: t.id,
         title: t.title,
         type: getTaskTypeLabel(t.type || t.module_type),

@@ -374,25 +374,53 @@ const API = {
 
   // === DashScope 视频生成（魔塔社区 Wan 模型） ===
   async _dashscopeFetch(url, options = {}) {
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url)
+    // 尝试多个 CORS 代理，提升可用性
+    const proxies = [
+      'https://corsproxy.io/?',
+      'https://api.allorigins.win/raw?url=',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ]
     const headers = { 'Authorization': `Bearer ${DASHSCOPE_API_KEY}` }
     if (options.method && options.method !== 'GET') {
       headers['Content-Type'] = 'application/json'
     }
     Object.assign(headers, options.headers || {})
-    const res = await fetch(proxyUrl, { ...options, headers })
-    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.output?.message || err.message || `DashScope 请求失败 (${res.status})`) }
-    return res.json()
+
+    let lastError = null
+    for (const proxy of proxies) {
+      try {
+        const proxyUrl = proxy + encodeURIComponent(url)
+        const res = await fetch(proxyUrl, { ...options, headers })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err.output?.message || err.message || `DashScope 请求失败 (${res.status})`)
+        }
+        return res.json()
+      } catch (e) {
+        lastError = e
+        // 继续尝试下一个代理
+      }
+    }
+    throw lastError || new Error('所有 CORS 代理均不可用，请检查网络')
   },
 
   async submitVideoTask(promptText, params = {}) {
     const styleMap = { 'realistic': '写实风格，真实感强，', 'cartoon': '卡通动画风格，色彩鲜艳，', 'sci-fi': '科幻风格，未来感，', 'painting': '油画风格，艺术感，' }
     const enhancedPrompt = (styleMap[params.style] || '') + promptText
-    const duration = Math.min(15, Math.max(2, parseInt(params.duration) || 5))
-    const resolution = (params.resolution || '720p').toUpperCase()
+
+    // wan2.1-t2v-turbo 是最便宜的模型，固定 5 秒、720P
+    const model = 'wan2.1-t2v-turbo'
+    const body = {
+      model,
+      input: { prompt: enhancedPrompt },
+      parameters: {
+        size: params.ratio === '9:16' ? '720*1280' : params.ratio === '1:1' ? '960*960' : '1280*720'
+      }
+    }
+
     const data = await this._dashscopeFetch(
       'https://dashscope.aliyuncs.com/api/v1/services/aigc/video-generation/video-synthesis',
-      { method: 'POST', headers: { 'X-DashScope-Async': 'enable' }, body: JSON.stringify({ model: 'wan2.1-t2v-plus', input: { prompt: enhancedPrompt }, parameters: { duration, resolution, ratio: params.ratio || '16:9' } }) }
+      { method: 'POST', headers: { 'X-DashScope-Async': 'enable' }, body: JSON.stringify(body) }
     )
     const taskId = data.output?.task_id
     if (taskId) return { taskId }

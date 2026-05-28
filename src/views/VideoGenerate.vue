@@ -52,22 +52,14 @@
             <div class="param-row">
               <div class="param-item">
                 <label>视频时长</label>
-                <el-select v-model="params.duration" class="param-select" placeholder="选择时长">
-                  <el-option label="5秒" value="5" />
-                  <el-option label="10秒" value="10" />
-                  <el-option label="15秒" value="15" />
-                </el-select>
+                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">固定 5 秒（免费版限制）</el-tag>
               </div>
-              
               <div class="param-item">
                 <label>分辨率</label>
-                <el-select v-model="params.resolution" class="param-select" placeholder="选择分辨率">
-                  <el-option label="720P" value="720P" />
-                  <el-option label="1080P" value="1080P" />
-                </el-select>
+                <el-tag type="info" effect="plain" style="width:100%;justify-content:center;height:36px;font-size:14px;">720P（最省成本）</el-tag>
               </div>
             </div>
-            
+
             <div class="param-item">
               <label>画面风格</label>
               <div class="style-options">
@@ -89,7 +81,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="param-item">
               <label>画面比例</label>
               <div class="ratio-options">
@@ -328,6 +320,7 @@ const params = reactive({
   ratio: '16:9',
   style: 'realistic'
 })
+// 注意：当前使用 wan2.1-t2v-turbo 模型，固定 5 秒 / 720P，仅比例可调
 
 const promptPresets = [
   { label: '自然风光', text: '壮观的日落景象，金色阳光洒在连绵的山脉上，水面波光粼粼' },
@@ -447,7 +440,16 @@ const handleGenerate = async () => {
     console.error('提交任务失败:', error)
     isGenerating.value = false
     if (timer) { clearInterval(timer); timer = null }
-    ElMessage.error('提交失败: ' + (error.message || '请检查网络后重试'))
+    const msg = error.message || ''
+    if (msg.includes('CORS') || msg.includes('代理')) {
+      ElMessage.error('网络代理不可用，请刷新页面重试')
+    } else if (msg.includes('403')) {
+      ElMessage.error('API 授权失败，请检查 DashScope 余额或权限')
+    } else if (msg.includes('429')) {
+      ElMessage.error('请求过于频繁，请稍后再试')
+    } else {
+      ElMessage.error('提交失败: ' + msg)
+    }
   }
 }
 

@@ -14,7 +14,7 @@
 ## 技术栈
 - 前端: Vue3 + Vite + Element Plus + Vue Router + ECharts
 - 后端: FastAPI + SQLite
-- AI API: 智谱AI (GLM-4 文本 + CogView-4 图像)
+- AI API: 智谱AI (GLM-4 文本 + CogView-4 图像)、阿里云百炼 DashScope (Wan2.1 视频)
 
 ## 已知问题
 - Register.vue 中注册 API 曾硬编码 localhost，已修复指向 Railway
